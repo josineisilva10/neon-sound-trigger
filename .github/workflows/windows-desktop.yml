@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - windows-desktop-setup
+      - fix/windows-desktop-functions
   workflow_dispatch:
 
 permissions:
@@ -23,6 +24,32 @@ jobs:
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
+
+      - name: Set up Python for VEXORA icon
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Generate VEXORA Windows icon
+        shell: pwsh
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pillow cairosvg
+          New-Item -ItemType Directory -Force -Path "src-tauri/icons" | Out-Null
+          @'
+          import cairosvg
+          from PIL import Image
+          from io import BytesIO
+
+          png = cairosvg.svg2png(url="public/vexora-logo.svg", output_width=256, output_height=256)
+          image = Image.open(BytesIO(png)).convert("RGBA")
+          image.save("src-tauri/icons/icon.ico", format="ICO", sizes=[(16,16),(24,24),(32,32),(48,48),(64,64),(128,128),(256,256)])
+          '@ | Set-Content -Encoding utf8 generate_icon.py
+          python generate_icon.py
+          if (-not (Test-Path "src-tauri/icons/icon.ico")) {
+            Write-Error "O ícone do VEXORA não foi gerado."
+            exit 1
+          }
 
       - name: Install frontend dependencies
         run: bun install --frozen-lockfile
@@ -44,12 +71,6 @@ jobs:
             Write-Error "The prerendered entry page does not contain the expected VEXORA SAMPLER marker."
             exit 1
           }
-
-      - name: Prepare Windows app icon
-        shell: pwsh
-        run: |
-          New-Item -ItemType Directory -Force -Path "src-tauri/icons" | Out-Null
-          Copy-Item "public/favicon.ico" "src-tauri/icons/icon.ico" -Force
 
       - name: Build Windows installers
         run: bunx --package @tauri-apps/cli tauri build --bundles nsis,msi
