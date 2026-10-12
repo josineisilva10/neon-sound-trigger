@@ -18,10 +18,11 @@ import { Waveform } from "@/components/vexora/Meters";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "ZENTRIX SAMPLER — Disparo de áudio pelo teclado" },
-      { name: "description", content: "ZENTRIX: sampler profissional para DJs com bancos, vinhetas, locuções, efeitos e papel de parede personalizado." },
-      { property: "og:title", content: "ZENTRIX SAMPLER" },
-      { property: "og:description", content: "ZENTRIX — painel profissional para disparo de vinhetas, locuções e efeitos para DJs." },
+      { title: "VEXORA SAMPLER — Disparo de áudio para DJs" },
+      { name: "description", content: "VEXORA SAMPLER: sampler profissional para DJs com bancos, vinhetas, locuções, efeitos e papel de parede personalizado." },
+      { property: "og:title", content: "VEXORA SAMPLER" },
+      { property: "og:description", content: "VEXORA — painel profissional para disparo de vinhetas, locuções e efeitos para DJs." },
+      { rel: "icon", type: "image/svg+xml", href: "/vexora-logo.svg" },
     ],
   }),
   component: App,
@@ -263,8 +264,9 @@ function App() {
 
       <main className="grid min-w-0 grid-cols-1 items-start gap-1.5 p-1.5 lg:grid-cols-[190px_minmax(0,1fr)]">
         <aside className="flex min-w-0 flex-col gap-1.5">
-          <div className="panel flex min-h-[42px] items-center justify-center overflow-hidden px-1 py-0.5">
-            <h1 className="text-center font-display text-lg font-extrabold leading-none tracking-[0.16em] text-neon-green neon-text">ZENTRIX<br /><span className="text-neon-cyan">SAMPLER</span></h1>
+          <div className="panel flex min-h-[48px] items-center justify-center gap-1.5 overflow-hidden px-1 py-1">
+            <img src="/vexora-logo.svg" alt="Símbolo VEXORA" className="size-9 shrink-0 drop-shadow-[0_0_7px_#00d9ff]" />
+            <h1 className="text-center font-display text-sm font-extrabold leading-none tracking-[0.12em] text-neon-green neon-text">VEXORA<br /><span className="text-neon-cyan">SAMPLER</span></h1>
           </div>
           <SidePanel selected={selected} />
           {st.show.editor && <AudioInfoPanel code={selected} ledActive={ledActive} onToggleLed={() => setLedActive((v) => !v)} />}
@@ -280,6 +282,19 @@ function App() {
           </div>
           {ledActive && audioPlaying ? <LedVisualizer onBack={() => setLedActive(false)} /> : <KeyboardPanel selected={selected} onSelect={setSelected} editMode={editMode} />}
           {st.show.editor && <PadEditor code={selected} />}
+          <div className="panel relative h-6 overflow-hidden border-cyan-400/60 bg-[#020713] px-0 py-0 shadow-[0_0_10px_rgba(0,217,255,0.15)]" aria-label="Créditos do VEXORA SAMPLER">
+            <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-8 bg-gradient-to-r from-[#020713] to-transparent" />
+            <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-8 bg-gradient-to-l from-[#020713] to-transparent" />
+            <div className="vexora-led-track h-full items-center">
+              {Array.from({ length: 2 }, (_, i) => <div key={i} className="flex h-full shrink-0 items-center gap-3 px-6 font-display text-[9px] font-bold tracking-[0.13em] text-neon-cyan">
+                <span className="text-neon-green">▰ ▰ ▰</span>
+                <span>CRIADO POR <strong className="text-white">NEYZINHO DAS PRODUÇÕES</strong></span>
+                <span className="text-neon-green">◆</span>
+                <span>WHATSAPP <strong className="text-white">(91) 99258-4049</strong></span>
+                <span className="text-neon-green">▰ ▰ ▰</span>
+              </div>)}
+            </div>
+          </div>
         </section>
       </main>
       {showSettings && <SettingsDialog onClose={() => setShowSettings(false)} />}
