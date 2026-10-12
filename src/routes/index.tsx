@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { Toaster } from "sonner";
-import { Maximize2, Settings as Cog, Play, Square, Repeat2, Scissors, Gauge, Volume2, SlidersHorizontal, Star, Music2 } from "lucide-react";
+import { Maximize2, X, Settings as Cog, Play, Square, Repeat2, Scissors, Gauge, Volume2, SlidersHorizontal, Star, Music2 } from "lucide-react";
 import { engine } from "@/lib/vexora/engine";
 import { getFile, requestPersistence } from "@/lib/vexora/db";
 import { detectLayout } from "@/lib/vexora/layout";
@@ -276,12 +276,13 @@ function App() {
           {st.show.editor && <AudioInfoPanel code={selected} ledActive={ledActive} onToggleLed={() => setLedActive((v) => !v)} />}
         </aside>
         <section className="flex min-w-0 flex-col gap-1.5">
-          <div className="relative aspect-[3/1] min-h-0 w-full overflow-hidden rounded-md border border-border" style={bannerWallStyle}>
+          <div className="relative aspect-[3/1] min-h-0 w-full overflow-hidden rounded-none border-0" style={bannerWallStyle}>
             {(!wall || !w.enabled) && <div className="absolute inset-0 bg-background" />}
             {wall && w.enabled && <div className="absolute inset-0 bg-background" style={{ opacity: w.dim }} />}
             <div className="absolute right-1 top-1 z-10 flex gap-1">
               <button className="btn !p-1.5" onClick={() => setShowSettings(true)} aria-label="Configurações"><Cog className="size-4" /></button>
-              <button className="btn !p-1.5" onClick={() => windowControl("max")} aria-label="Maximizar"><Maximize2 className="size-4" /></button>
+              <button className="btn !p-1.5" onClick={() => windowControl("max")} aria-label="Maximizar ou restaurar"><Maximize2 className="size-4" /></button>
+              {isDesktop() && <button className="btn !p-1.5 text-neon-red" onClick={() => windowControl("close")} aria-label="Fechar VEXORA SAMPLER"><X className="size-4" /></button>}
             </div>
           </div>
           {ledActive && audioPlaying ? <LedVisualizer onBack={() => setLedActive(false)} /> : <KeyboardPanel selected={selected} onSelect={setSelected} editMode={editMode} />}
