@@ -154,6 +154,17 @@
   0% { background: var(--led); }
 }
 @layer components {
+  .keyboard-fit-panel {
+    container-type: inline-size;
+    overflow: hidden;
+  }
+  .keyboard-fit-panel .padkey {
+    min-width: 0;
+    padding-inline: clamp(2px, 0.25cqi, 6px);
+  }
+  .keyboard-fit-panel .padkey > div > span {
+    font-size: clamp(7px, 1.35cqi, 11px);
+  }
   .btn { display:inline-flex; align-items:center; justify-content:center; gap:.35rem; border:1px solid var(--border); background: color-mix(in oklab, var(--secondary) 80%, transparent); border-radius:.4rem; padding:.35rem .6rem; font-size:.8rem; font-weight:600; transition: border-color .1s, box-shadow .1s; }
   .btn:hover { border-color: var(--neon-cyan); box-shadow: 0 0 8px color-mix(in oklab, var(--neon-cyan) 50%, transparent); }
   .btn:disabled { opacity:.4; pointer-events:none; }
