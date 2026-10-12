@@ -48,9 +48,9 @@ export function KeyboardPanel({ selected, onSelect, editMode }: Props) {
       </div>
     ));
 
-  // Container-relative sizing lets the complete keyboard scale down to the
-  // available panel width instead of forcing horizontal scrolling.
-  const unit = `clamp(1.35rem, calc((100cqi - 5rem) / 24), ${3.6 * st.padScale}rem)`;
+  // Keep the keyboard large while scaling its keys to fit the available width.
+  // The parent layout provides the container query width (cqi).
+  const unit = `clamp(1.5rem, calc((100cqi - 7rem) / 30), ${4.2 * st.padScale}rem)`;
 
   if (st.view === "grid") {
     const codes = layoutCodes(st.layout).filter((c) => bank.pads[c]);
