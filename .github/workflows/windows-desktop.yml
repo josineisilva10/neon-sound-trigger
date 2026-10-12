@@ -45,6 +45,12 @@ jobs:
             exit 1
           }
 
+      - name: Prepare Windows app icon
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path "src-tauri/icons" | Out-Null
+          Copy-Item "public/favicon.ico" "src-tauri/icons/icon.ico" -Force
+
       - name: Build Windows installers
         run: bunx --package @tauri-apps/cli tauri build --bundles nsis,msi
 
