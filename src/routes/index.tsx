@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Toaster } from "sonner";
-import { Keyboard, Library as LibIcon, Maximize2, Minus, Pencil, Settings as Cog, ShieldCheck, ShieldOff, X } from "lucide-react";
+import { Keyboard, Maximize2, Minus, Pencil, Settings as Cog, ShieldCheck, ShieldOff, X } from "lucide-react";
 import { engine } from "@/lib/vexora/engine";
 import { getFile, requestPersistence } from "@/lib/vexora/db";
 import { detectLayout } from "@/lib/vexora/layout";
@@ -11,7 +11,6 @@ import { isDesktop, registerGlobalShortcuts, unregisterGlobalShortcuts, windowCo
 import { KeyboardPanel } from "@/components/vexora/Keyboard";
 import { PadEditor } from "@/components/vexora/PadEditor";
 import { SidePanel } from "@/components/vexora/SidePanel";
-import { Library } from "@/components/vexora/Library";
 import { SettingsDialog } from "@/components/vexora/Settings";
 
 export const Route = createFileRoute("/")({
@@ -105,7 +104,6 @@ function App() {
             <button className={`btn ${armed ? "text-neon-green" : "text-neon-red"}`} onClick={() => setArmed(!armed)} title="Armar/desarmar disparo pelo teclado">{armed ? <ShieldCheck className="size-4" /> : <ShieldOff className="size-4" />}{armed ? "ARMADO" : "DESARMADO"}</button>
             <button className={`btn ${editMode ? "text-neon-orange" : ""}`} onClick={() => setEditMode(!editMode)} title="Modo edição: clicar seleciona sem tocar"><Pencil className="size-4" /> Edição</button>
             <button className="btn" onClick={() => setSettings({ view: st.view === "keyboard" ? "grid" : "keyboard" })}><Keyboard className="size-4" /> {st.view === "keyboard" ? "Grade" : "Teclado"}</button>
-            <button className="btn" onClick={() => setSettings({ show: { ...st.show, library: !st.show.library } })}><LibIcon className="size-4" /></button>
             <button className="btn" onClick={() => setShowSettings(true)} aria-label="Configurações"><Cog className="size-4" /></button>
             {isDesktop() && <button className="btn" onClick={() => windowControl("min")} aria-label="Minimizar"><Minus className="size-4" /></button>}
             <button className="btn" onClick={() => windowControl("max")} aria-label="Maximizar"><Maximize2 className="size-4" /></button>
@@ -113,13 +111,12 @@ function App() {
           </div>
         </div>
       </header>
-      <main className={`grid gap-3 p-3 ${st.show.library ? "lg:grid-cols-[260px_minmax(0,1fr)_300px]" : "lg:grid-cols-[260px_minmax(0,1fr)]"}`}>
+      <main className="grid gap-3 p-3 lg:grid-cols-[260px_minmax(0,1fr)]">
         <SidePanel selected={selected} />
         <div className="flex min-w-0 flex-col gap-3">
           <KeyboardPanel selected={selected} onSelect={setSelected} editMode={editMode} />
           {st.show.editor && <PadEditor code={selected} />}
         </div>
-        {st.show.library && <div className="lg:max-h-[calc(100vh-5rem)]"><Library selected={selected} /></div>}
       </main>
       {showSettings && <SettingsDialog onClose={() => setShowSettings(false)} />}
     </div>
