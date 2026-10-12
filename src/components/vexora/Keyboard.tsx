@@ -68,15 +68,25 @@ export function KeyboardPanel({ selected, onSelect, editMode }: Props) {
     );
   }
 
+  // Show only the two bottom rows requested from the keyboard reference:
+  // Shift + punctuation/letters, then Ctrl/Win/Alt/Space/AltGr/Win.
+  const sourceRows = mainRows(st.layout);
+  const letterRow = sourceRows[3].filter((key) =>
+    "code" in key && [
+      "ShiftLeft", "IntlBackslash", "KeyZ", "KeyX", "KeyC", "KeyV",
+      "KeyB", "KeyN", "KeyM", "Comma", "Period", "Slash",
+    ].includes(key.code)
+  );
+  const modifierRow = sourceRows[4].filter((key) =>
+    "code" in key && [
+      "ControlLeft", "MetaLeft", "AltLeft", "Space", "AltRight", "MetaRight",
+    ].includes(key.code)
+  );
+
   return (
     <div className="panel keyboard-fit-panel p-2 sm:p-3" style={{ ["--u" as string]: unit }}>
-      <div className="flex w-full min-w-0 items-start gap-2">
-        <div className="flex min-w-0 flex-1 flex-col gap-1">
-          {st.show.fn && <div className="mb-2">{renderRows([FUNCTION_ROW])}</div>}
-          {renderRows(mainRows(st.layout))}
-        </div>
-        {st.show.nav && <div className="flex min-w-0 flex-col gap-1">{st.show.fn && <div className="mb-2 h-[var(--u)]" />}{renderRows(NAV_ROWS)}</div>}
-        {st.show.numpad && <div className="flex min-w-0 flex-col gap-1">{st.show.fn && <div className="mb-2 h-[var(--u)]" />}{renderRows(numpadRows(st.layout))}</div>}
+      <div className="flex w-full min-w-0 flex-col gap-1">
+        {renderRows([letterRow, modifierRow])}
       </div>
     </div>
   );
