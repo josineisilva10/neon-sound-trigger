@@ -50,7 +50,7 @@ export function KeyboardPanel({ selected, onSelect, editMode }: Props) {
 
   // Keep the keyboard large while scaling its keys to fit the available width.
   // The parent layout provides the container query width (cqi).
-  const unit = `clamp(1.8rem, calc((100cqi - 8rem) / 23), ${4.5 * st.padScale}rem)`;
+  const unit = `clamp(2.2rem, calc((100cqi - 4rem) / 18), ${5.2 * st.padScale}rem)`;
 
   if (st.view === "grid") {
     const codes = layoutCodes(st.layout).filter((c) => bank.pads[c]);
@@ -79,8 +79,8 @@ export function KeyboardPanel({ selected, onSelect, editMode }: Props) {
 
   return (
     <div className="panel keyboard-fit-panel p-2 sm:p-3" style={{ ["--u" as string]: unit }}>
-      <div className="flex w-full min-w-0 items-start gap-3">
-        <div className="flex min-w-0 flex-none flex-col gap-1">
+      <div className="flex w-full min-w-0 items-start gap-2">
+        <div className="flex min-w-0 flex-1 flex-col gap-1">
           {st.show.fn && <div className="mb-2">{renderRows([FUNCTION_ROW])}</div>}
           {renderRows(compactRows)}
         </div>
