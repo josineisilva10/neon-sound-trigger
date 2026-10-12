@@ -2,7 +2,7 @@ import { useEffect, useRef, useSyncExternalStore } from "react";
 import { engine, fmtTime } from "@/lib/vexora/engine";
 import { FUNCTION_ROW, NAV_ROWS, keyLabel, layoutCodes, mainRows, numpadRows, type Row } from "@/lib/vexora/layout";
 import { activeBank, defaultPad, swapPads, updatePad, useAppState, type LibItem, type Pad } from "@/lib/vexora/store";
-import { trigger } from "@/lib/vexora/actions";
+import { importAudioFiles, trigger } from "@/lib/vexora/actions";
 
 interface Props {
   selected: string | null;
@@ -108,9 +108,22 @@ function PadKey({ code, w, pad, lib, selected, reserved, playing, label, barRef,
       onDrop={(e) => {
         e.preventDefault();
         const k = e.dataTransfer.getData("vexora/key");
-        const f = e.dataTransfer.getData("vexora/file");
-        if (k && k !== code) onDropKey(k);
-        else if (f) onDropFile(f);
+        const fileId = e.dataTransfer.getData("vexora/file");
+        const droppedFiles = Array.from(e.dataTransfer.files ?? []);
+        if (k && k !== code) {
+          onDropKey(k);
+        } else if (fileId) {
+          onDropFile(fileId);
+        } else if (droppedFiles.length) {
+          // Import audio files dragged directly from the computer onto a key.
+          void importAudioFiles(droppedFiles).then((ids) => {
+            const id = ids[0];
+            if (!id) return;
+            const name = droppedFiles[0].name.replace(/\.[^.]+$/, "");
+            updatePad(bank.id, code, { fileId: id, name: bank.pads[code]?.name || name });
+            onSelect(code);
+          });
+        }
       }}
       onMouseDown={(e) => e.preventDefault()}
       onClick={onClick}
