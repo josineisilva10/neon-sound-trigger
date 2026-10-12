@@ -256,6 +256,8 @@ function App() {
 
   const w = st.wallpaper;
   const wallStyle = wall && w.enabled ? { backgroundImage: `url(${wall})`, backgroundSize: FIT[w.fit], backgroundPosition: `${w.x}% ${w.y}%`, backgroundRepeat: "no-repeat" } : undefined;
+  // The dedicated banner uses the full 3:1 image so its footer/contact details stay visible.
+  const bannerWallStyle = wall && w.enabled ? { ...wallStyle, backgroundSize: "100% 100%", backgroundPosition: "center", backgroundRepeat: "no-repeat" } : undefined;
 
   return (
     <div className="relative min-h-screen" data-anim={st.animations ? "on" : "off"} style={{ ["--panel-alpha" as string]: `${wallStyle ? w.panelOpacity : 85}%` }}>
@@ -272,7 +274,7 @@ function App() {
           {st.show.editor && <AudioInfoPanel code={selected} ledActive={ledActive} onToggleLed={() => setLedActive((v) => !v)} />}
         </aside>
         <section className="flex min-w-0 flex-col gap-1.5">
-          <div className="relative min-h-[180px] overflow-hidden rounded-md border border-border sm:min-h-[230px] lg:min-h-[31vh]" style={wallStyle}>
+          <div className="relative aspect-[3/1] min-h-0 w-full overflow-hidden rounded-md border border-border" style={bannerWallStyle}>
             {(!wall || !w.enabled) && <div className="absolute inset-0 bg-background" />}
             {wall && w.enabled && <div className="absolute inset-0 bg-background" style={{ opacity: w.dim }} />}
             <div className="absolute right-1 top-1 z-10 flex gap-1">
