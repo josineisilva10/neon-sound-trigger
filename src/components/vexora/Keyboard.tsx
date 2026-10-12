@@ -43,11 +43,15 @@ export function KeyboardPanel({ selected, onSelect, editMode }: Props) {
   });
 
   const renderRows = (rows: Row[]) =>
-    rows.map((row, i) => (
-      <div key={i} className={`flex w-full min-w-0 gap-0.5 ${row.length === 1 && "code" in row[0] && row[0].code === "Space" ? "justify-center" : ""}`}>
+    rows.map((row, i) => {
+      const isSpaceRow = row.length === 1 && "code" in row[0] && row[0].code === "Space";
+      return (
+      <div key={i} className={`flex w-full min-w-0 gap-0.5 ${isSpaceRow ? "justify-center" : ""}`}>
         {row.map((k, j) => ("gap" in k ? <div key={j} style={{ width: `calc(var(--u) * ${k.gap})` }} className="flex-none" /> : <PadKey key={k.code} {...keyProps(k.code, k.w)} />))}
       </div>
-    ));
+      );
+    })
+  );
 
   // Keep the keyboard large while scaling its keys to fit the available width.
   // The parent layout provides the container query width (cqi).
@@ -75,7 +79,7 @@ export function KeyboardPanel({ selected, onSelect, editMode }: Props) {
   const compactRows = mainRows(st.layout).map((row, index) => {
     if (index === 2) return row.filter((key) => !("code" in key) || key.code !== "CapsLock");
     if (index === 3) return row.filter((key) => !("code" in key) || (key.code !== "ShiftLeft" && key.code !== "ShiftRight"));
-    if (index === 4) return [{ code: "Space", w: 7.5 }];
+    if (index === 4) return [{ code: "Space", w: 6.25 }];
     return row;
   });
 
