@@ -26,7 +26,7 @@ export function SidePanel({ selected }: { selected: string | null }) {
   }, []);
 
   return (
-    <aside className="grid min-w-0 grid-cols-1 gap-1.5 md:grid-cols-3">
+    <aside className="flex min-w-0 flex-col gap-1.5">
       <div className="panel p-2">
         <div className="mb-1 flex items-center justify-between">
           <span className="font-display text-xs tracking-widest text-neon-cyan">MASTER</span>
