@@ -166,7 +166,7 @@ function LedVisualizer({ onBack }: { onBack: () => void }) {
         {levels.map((level, i) => {
           const h = Math.max(3, Math.min(100, 7 + level * 115));
           const color = level > 0.68 ? "#ff3b5c" : level > 0.43 ? "#ffb52e" : level > 0.2 ? "#22d3ee" : "#1683ff";
-          return <div key={i} className="relative flex h-full max-w-4 flex-1 flex-col justify-end gap-[3px]" style={{ filter: `drop-shadow(0 0 4px ${color})` }}>
+          return <div key={i} className="relative flex h-full max-w-4 flex-1 flex-col-reverse justify-end gap-[3px]" style={{ filter: `drop-shadow(0 0 4px ${color})` }}>
             {Array.from({ length: 16 }, (_, j) => {
               const lit = (j + 1) / 16 <= h / 100;
               return <div key={j} className="min-h-[3px] flex-1 rounded-[1px] transition-colors duration-75" style={{ background: lit ? color : "rgba(30,64,91,.25)", opacity: lit ? 0.95 : 1 }} />;
