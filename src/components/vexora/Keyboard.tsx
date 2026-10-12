@@ -43,12 +43,14 @@ export function KeyboardPanel({ selected, onSelect, editMode }: Props) {
 
   const renderRows = (rows: Row[]) =>
     rows.map((row, i) => (
-      <div key={i} className="flex gap-1">
+      <div key={i} className="flex min-w-0 gap-1">
         {row.map((k, j) => ("gap" in k ? <div key={j} style={{ width: `calc(var(--u) * ${k.gap})` }} className="flex-none" /> : <PadKey key={k.code} {...keyProps(k.code, k.w)} />))}
       </div>
     ));
 
-  const unit = `${3.6 * st.padScale}rem`;
+  // Container-relative sizing lets the complete keyboard scale down to the
+  // available panel width instead of forcing horizontal scrolling.
+  const unit = `clamp(1.35rem, calc((100cqi - 5rem) / 24), ${3.6 * st.padScale}rem)`;
 
   if (st.view === "grid") {
     const codes = layoutCodes(st.layout).filter((c) => bank.pads[c]);
@@ -67,14 +69,14 @@ export function KeyboardPanel({ selected, onSelect, editMode }: Props) {
   }
 
   return (
-    <div className="panel overflow-x-auto p-3" style={{ ["--u" as string]: unit }}>
-      <div className="flex w-max gap-4">
-        <div className="flex flex-col gap-1">
+    <div className="panel keyboard-fit-panel p-2 sm:p-3" style={{ ["--u" as string]: unit }}>
+      <div className="flex w-full min-w-0 items-start gap-2">
+        <div className="flex min-w-0 flex-1 flex-col gap-1">
           {st.show.fn && <div className="mb-2">{renderRows([FUNCTION_ROW])}</div>}
           {renderRows(mainRows(st.layout))}
         </div>
-        {st.show.nav && <div className="flex flex-col gap-1">{st.show.fn && <div className="mb-2 h-[var(--u)]" />}{renderRows(NAV_ROWS)}</div>}
-        {st.show.numpad && <div className="flex flex-col gap-1">{st.show.fn && <div className="mb-2 h-[var(--u)]" />}{renderRows(numpadRows(st.layout))}</div>}
+        {st.show.nav && <div className="flex min-w-0 flex-col gap-1">{st.show.fn && <div className="mb-2 h-[var(--u)]" />}{renderRows(NAV_ROWS)}</div>}
+        {st.show.numpad && <div className="flex min-w-0 flex-col gap-1">{st.show.fn && <div className="mb-2 h-[var(--u)]" />}{renderRows(numpadRows(st.layout))}</div>}
       </div>
     </div>
   );
