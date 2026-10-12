@@ -113,7 +113,7 @@ function App() {
           </div>
         </div>
       </header>
-      <main className={`grid gap-3 p-3 lg:grid-cols-[260px_minmax(0,1fr)${st.show.library ? "_300px" : ""}]`} style={{ gridTemplateColumns: undefined }}>
+      <main className={`grid gap-3 p-3 ${st.show.library ? "lg:grid-cols-[260px_minmax(0,1fr)_300px]" : "lg:grid-cols-[260px_minmax(0,1fr)]"}`}>
         <SidePanel selected={selected} />
         <div className="flex min-w-0 flex-col gap-3">
           <KeyboardPanel selected={selected} onSelect={setSelected} editMode={editMode} />
