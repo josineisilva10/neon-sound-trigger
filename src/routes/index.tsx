@@ -266,7 +266,7 @@ function App() {
       {wallStyle && w.target === "full" && <div className="fixed inset-0 -z-10" style={wallStyle}><div className="absolute inset-0 bg-background" style={{ opacity: w.dim }} /></div>}
       <Toaster theme="dark" position="bottom-right" richColors />
 
-      <main className="grid min-w-0 grid-cols-1 items-start gap-1.5 p-1.5 lg:grid-cols-[190px_minmax(0,1fr)]">
+      <main className="grid min-w-0 grid-cols-1 items-start gap-1.5 px-1.5 pb-1.5 pt-0 lg:grid-cols-[190px_minmax(0,1fr)]">
         <aside className="flex min-w-0 flex-col gap-1.5">
           <div className="panel flex min-h-[48px] items-center justify-center gap-1.5 overflow-hidden px-1 py-1">
             <img src="/vexora-logo.svg" alt="Símbolo VEXORA" className="size-9 shrink-0 drop-shadow-[0_0_7px_#00d9ff]" />
