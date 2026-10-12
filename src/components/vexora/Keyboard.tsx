@@ -50,8 +50,7 @@ export function KeyboardPanel({ selected, onSelect, editMode }: Props) {
         {row.map((k, j) => ("gap" in k ? <div key={j} style={{ width: `calc(var(--u) * ${k.gap})` }} className="flex-none" /> : <PadKey key={k.code} {...keyProps(k.code, k.w)} />))}
       </div>
       );
-    })
-  );
+    });
 
   // Keep the keyboard large while scaling its keys to fit the available width.
   // The parent layout provides the container query width (cqi).
