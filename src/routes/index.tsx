@@ -41,98 +41,65 @@ function AudioInfoPanel({ code, ledActive, onToggleLed }: { code: string | null;
   const [trimEnd, setTrimEnd] = useState(0);
 
   const toggleLoop = () => {
-    if (code) updatePad(bank.id, code, { mode: pad?.mode === "loop" ? "once" : "loop" });
+    if (code && pad) updatePad(bank.id, code, { mode: pad.mode === "loop" ? "once" : "loop" });
   };
   const cycleSpeed = () => {
-    if (!code) return;
+    if (!code || !pad) return;
     const speeds = [0.5, 0.75, 1, 1.25, 1.5, 2];
-    const current = pad?.speed ?? 1;
-    const next = speeds.find((v) => v > current + 0.001) ?? speeds[0];
+    const next = speeds.find((v) => v > (pad.speed ?? 1) + 0.001) ?? speeds[0];
     updatePad(bank.id, code, { speed: next });
   };
 
   const actions = [
-    { label: "CORTAR", icon: Scissors, color: "text-neon-cyan", border: "border-neon-cyan/50", onClick: () => { setTrimStart(0); setTrimEnd(item?.duration ?? 0); setShowTrim(true); }, title: "Selecionar trecho para cortar" },
-    { label: pad?.mode === "loop" ? "REPETIR: ON" : "REPETIR", icon: Repeat2, color: "text-neon-green", border: "border-neon-green/50", onClick: toggleLoop, title: "Alternar repetição" },
-    { label: `VELOC. ${(pad?.speed ?? 1).toFixed(2)}×`, icon: Gauge, color: "text-neon-orange", border: "border-neon-orange/50", onClick: cycleSpeed, title: "Alterar velocidade do pad" },
-    { label: "NORMALIZAR", icon: Volume2, color: "text-neon-purple", border: "border-neon-purple/50", onClick: () => { if (code) void normalizePadAudio(bank.id, code); }, title: "Normalizar volume do áudio" },
-    { label: ledActive ? "LED ATIVO: ON" : "LED ATIVO", icon: SlidersHorizontal, color: "text-neon-cyan", border: "border-neon-cyan/50", onClick: onToggleLed, title: "Ativar visualizador LED durante a reprodução" },
-    { label: favorite ? "FAVORITO ★" : "FAVORITO", icon: Star, color: favorite ? "text-neon-orange" : "text-neon-red", border: "border-neon-red/50", onClick: () => setFavorite(!favorite), title: "Marcar como favorito" },
+    { label: "CORTAR", icon: Scissors, color: "text-neon-cyan", border: "border-neon-cyan/50", disabled: !item, onClick: () => { if (item) { setTrimStart(0); setTrimEnd(item.duration); setShowTrim(true); } }, title: "Selecionar trecho para cortar" },
+    { label: pad?.mode === "loop" ? "REPETIR: ON" : "REPETIR", icon: Repeat2, color: "text-neon-green", border: "border-neon-green/50", disabled: !item, onClick: toggleLoop, title: "Alternar repetição" },
+    { label: `VELOC. ${(pad?.speed ?? 1).toFixed(2)}×`, icon: Gauge, color: "text-neon-orange", border: "border-neon-orange/50", disabled: !item, onClick: cycleSpeed, title: "Alterar velocidade do pad" },
+    { label: "NORMALIZAR", icon: Volume2, color: "text-neon-purple", border: "border-neon-purple/50", disabled: !item, onClick: () => { if (code && item) void normalizePadAudio(bank.id, code); }, title: "Normalizar volume do áudio" },
+    { label: ledActive ? "LED ATIVO: ON" : "LED ATIVO", icon: SlidersHorizontal, color: "text-neon-cyan", border: "border-neon-cyan/50", disabled: false, onClick: onToggleLed, title: "Ativar visualizador LED durante a reprodução" },
+    { label: favorite ? "FAVORITO ★" : "FAVORITO", icon: Star, color: favorite ? "text-neon-orange" : "text-neon-red", border: "border-neon-red/50", disabled: false, onClick: () => setFavorite(!favorite), title: "Marcar como favorito" },
   ];
 
   return (
-    <div className="panel min-w-0 space-y-0.5 p-0.5">
-      <div className="flex items-center justify-between gap-1">
-        <h2 className="font-display text-[10px] font-bold tracking-wide text-neon-cyan">INFORMAÇÕES DO ÁUDIO</h2>
-        <span className="text-[8px] text-muted-foreground">{item ? "SELECIONADO" : "SEM ÁUDIO"}</span>
+    <div className="panel min-w-0 space-y-1 p-1">
+      <div className="grid grid-cols-3 gap-1">
+        {actions.map(({ label, icon: Icon, color, border, onClick, title, disabled }) => (
+          <button key={label} className={`flex min-h-8 flex-col items-center justify-center gap-0 rounded-md border bg-background/50 px-0.5 py-0.5 transition-colors hover:bg-muted/70 ${border} ${color}`} onClick={onClick} title={title} disabled={disabled}>
+            <Icon className="size-3.5" />
+            <span className="text-center text-[8px] font-bold leading-tight">{label}</span>
+          </button>
+        ))}
       </div>
-      {!item ? (
-        <div className="flex min-h-16 items-center gap-2 rounded-md border border-border bg-background/40 p-2">
-          <Music2 className="size-5 text-neon-cyan" />
-          <p className="text-[10px] text-muted-foreground">{code ? "Esta tecla ainda não tem áudio." : "Selecione uma tecla com áudio para ver os detalhes."}</p>
+      {showTrim && item && code && (
+        <div className="space-y-1 rounded-md border border-neon-cyan/50 bg-background/80 p-1.5">
+          <div className="flex items-center justify-between gap-2">
+            <strong className="text-[9px] text-neon-cyan">CORTAR ÁUDIO · {item.name}</strong>
+            <button className="btn !px-2 !py-0.5 text-[9px]" onClick={() => setShowTrim(false)}>Fechar</button>
+          </div>
+          <div className="relative overflow-hidden rounded border border-border bg-[#080d1b] p-1">
+            <div className="mb-0.5 flex justify-between font-mono text-[8px] text-slate-400"><span>00:00</span><span>{fmtTime(item.duration / 2)}</span><span>{fmtTime(item.duration)}</span></div>
+            <div className="relative flex h-12 items-center gap-px overflow-hidden rounded border border-slate-700/70">
+              {item.peaks.map((peak, i) => {
+                const t = (i / Math.max(1, item.peaks.length - 1)) * item.duration;
+                const selectedPeak = t >= trimStart && t <= trimEnd;
+                return <div key={i} className="flex-1 rounded-sm" style={{height: `${Math.max(4, peak * 90)}%`,background: selectedPeak ? "#22d3ee" : "#64748b",opacity:selectedPeak ? 0.95 : 0.4}} />;
+              })}
+              <div className="pointer-events-none absolute inset-y-0 border-x-2 border-cyan-300 bg-cyan-400/15" style={{left:`${(trimStart / Math.max(item.duration,0.01))*100}%`,width:`${Math.max(0,(trimEnd-trimStart)/Math.max(item.duration,0.01)*100)}%`}} />
+            </div>
+            <div className="mt-0.5 flex justify-between text-[8px] text-cyan-300"><span>Início: {trimStart.toFixed(2)} s</span><span>Fim: {trimEnd.toFixed(2)} s</span></div>
+          </div>
+          <label className="block text-[9px]">Ponto inicial
+            <input aria-label="Ponto inicial do corte" className="w-full accent-cyan-400" type="range" min={0} max={Math.max(0, item.duration - 0.05)} step={0.01} value={Math.min(trimStart, Math.max(0, item.duration - 0.05))} onChange={(e) => setTrimStart(Math.min(+e.target.value, trimEnd - 0.05))} />
+          </label>
+          <label className="block text-[9px]">Ponto final
+            <input aria-label="Ponto final do corte" className="w-full accent-cyan-400" type="range" min={Math.min(item.duration, trimStart + 0.05)} max={item.duration} step={0.01} value={Math.max(trimEnd, trimStart + 0.05)} onChange={(e) => setTrimEnd(+e.target.value)} />
+          </label>
+          <div className="grid grid-cols-2 gap-1">
+            <button className="btn !py-1 text-[9px]" onClick={() => { if (trimEnd > trimStart) { void trimPadAudio(bank.id, code, trimStart, trimEnd); setShowTrim(false); } }}>✓ MANTER SELEÇÃO</button>
+            <button className="btn !py-1 text-[9px]" onClick={() => { setTrimStart(0); setTrimEnd(item.duration); }}>↺ REINICIAR</button>
+          </div>
         </div>
-      ) : (
-        <>
-          <div className="flex min-w-0 items-center gap-1 rounded-md border border-border bg-background/40 p-0.5">
-            <Music2 className="size-4 shrink-0 text-neon-cyan" />
-            <div className="min-w-0 flex-1">
-              <div className="truncate text-[10px] font-semibold">{pad?.name || item.name}</div>
-              <div className="text-[8px] text-muted-foreground">{fmtTime(item.duration)} · {item.format} · {(item.size / (1024 * 1024)).toFixed(1)} MB</div>
-            </div>
-            <button className="btn !p-1" title="Tocar áudio" onClick={() => code && trigger(bank.id, code)}><Play className="size-3" /></button>
-            <button className="btn !p-1" title="Parar áudio" onClick={() => code && stopPad(bank.id, code)}><Square className="size-3" /></button>
-          </div>
-          <div className="rounded-md border border-neon-cyan/30 bg-background/60 px-1 py-0.5">
-            <Waveform peaks={item.peaks} color={pad?.color || "#22d3ee"} height={20} />
-          </div>
-          <div className="grid grid-cols-3 gap-1 text-[7px]">
-            <div className="rounded border border-border bg-background/40 p-1"><span className="block text-muted-foreground">FORMATO</span><strong>{item.format}</strong></div>
-            <div className="rounded border border-border bg-background/40 p-1"><span className="block text-muted-foreground">DURAÇÃO</span><strong>{fmtTime(item.duration)}</strong></div>
-            <div className="rounded border border-border bg-background/40 p-1"><span className="block text-muted-foreground">TAMANHO</span><strong>{(item.size / (1024 * 1024)).toFixed(1)} MB</strong></div>
-          </div>
-          {showTrim && (
-            <div className="space-y-2 rounded-md border border-neon-cyan/50 bg-background/80 p-2">
-              <div className="flex items-center justify-between gap-2">
-                <strong className="text-[10px] text-neon-cyan">CORTAR ÁUDIO</strong>
-                <button className="btn !px-2 !py-1 text-[9px]" onClick={() => setShowTrim(false)}>Fechar</button>
-              </div>
-              <div className="flex items-center justify-between gap-2 text-[8px] text-muted-foreground">
-                <span>{pad?.name || item.name}</span><span>{fmtTime(item.duration)} · {item.format}</span>
-              </div>
-              <div className="relative overflow-hidden rounded-md border border-border bg-[#080d1b] p-2">
-                <div className="mb-1 flex justify-between font-mono text-[8px] text-slate-400"><span>00:00</span><span>{fmtTime(item.duration / 2)}</span><span>{fmtTime(item.duration)}</span></div>
-                <div className="relative flex h-20 items-center gap-[1px] overflow-hidden rounded border border-slate-700/70">
-                  {item.peaks.map((peak, i) => {
-                    const t = (i / Math.max(1, item.peaks.length - 1)) * item.duration;
-                    const selectedPeak = t >= trimStart && t <= trimEnd;
-                    return <div key={i} className="flex-1 rounded-sm" style={{height: `${Math.max(4, peak * 90)}%`,background: selectedPeak ? "#22d3ee" : "#64748b",opacity:selectedPeak ? 0.95 : 0.4}} />;
-                  })}
-                  <div className="pointer-events-none absolute inset-y-0 border-x-2 border-cyan-300 bg-cyan-400/15" style={{left:`${(trimStart / Math.max(item.duration,0.01))*100}%`,width:`${Math.max(0,(trimEnd-trimStart)/Math.max(item.duration,0.01)*100)}%`}} />
-                </div>
-                <div className="mt-1 flex justify-between text-[8px] text-cyan-300"><span>Início: {trimStart.toFixed(2)} s</span><span>Fim: {trimEnd.toFixed(2)} s</span></div>
-              </div>
-              <label className="block text-[9px]">Ponto inicial
-                <input aria-label="Ponto inicial do corte" className="w-full accent-cyan-400" type="range" min={0} max={Math.max(0, item.duration - 0.05)} step={0.01} value={Math.min(trimStart, Math.max(0, item.duration - 0.05))} onChange={(e) => setTrimStart(Math.min(+e.target.value, trimEnd - 0.05))} />
-              </label>
-              <label className="block text-[9px]">Ponto final
-                <input aria-label="Ponto final do corte" className="w-full accent-cyan-400" type="range" min={Math.min(item.duration, trimStart + 0.05)} max={item.duration} step={0.01} value={Math.max(trimEnd, trimStart + 0.05)} onChange={(e) => setTrimEnd(+e.target.value)} />
-              </label>
-              <div className="grid grid-cols-2 gap-1">
-                <button className="btn !py-1.5 text-[9px]" onClick={() => { if (code && trimEnd > trimStart) { void trimPadAudio(bank.id, code, trimStart, trimEnd); setShowTrim(false); } }}>✓ MANTER SELEÇÃO</button>
-                <button className="btn !py-1.5 text-[9px]" onClick={() => { setTrimStart(0); setTrimEnd(item.duration); }}>↺ REINICIAR SELEÇÃO</button>
-              </div>
-            </div>
-          )}
-          <div className="grid grid-cols-3 gap-0.5">
-            {actions.map(({ label, icon: Icon, color, border, onClick, title }) => (
-              <button key={label} className={`flex min-h-8 flex-col items-center justify-center gap-0 rounded-md border bg-background/50 px-0.5 py-0.5 transition-colors hover:bg-muted/70 ${border} ${color}`} onClick={onClick} title={title} disabled={!onClick}>
-                <Icon className="size-3" />
-                <span className="text-center text-[7px] font-bold leading-tight">{label}</span>
-              </button>
-            ))}
-          </div>
-        </>
       )}
+      {!item && <p className="text-center text-[8px] text-muted-foreground">Selecione uma tecla com áudio para usar corte, repetição, velocidade e normalização.</p>}
     </div>
   );
 }
@@ -266,17 +233,17 @@ function App() {
       {wallStyle && w.target === "full" && <div className="fixed inset-0 -z-10" style={wallStyle}><div className="absolute inset-0 bg-background" style={{ opacity: w.dim }} /></div>}
       <Toaster theme="dark" position="bottom-right" richColors />
 
-      <main className="grid min-w-0 grid-cols-1 items-start gap-1.5 px-1.5 pb-1.5 pt-0 lg:grid-cols-[190px_minmax(0,1fr)]">
-        <aside className="flex min-w-0 flex-col gap-1.5">
-          <div className="panel flex min-h-[48px] items-center justify-center gap-1.5 overflow-hidden px-1 py-1">
-            <img src="/vexora-logo.svg" alt="Símbolo VEXORA" className="size-9 shrink-0 drop-shadow-[0_0_7px_#00d9ff]" />
+      <main className="grid min-w-0 grid-cols-1 items-start gap-1 px-1 pb-1 pt-0 lg:grid-cols-[176px_minmax(0,1fr)]">
+        <aside className="flex min-w-0 flex-col gap-1">
+          <div className="panel flex min-h-[38px] items-center justify-center gap-1 overflow-hidden px-1 py-0.5">
+            <img src="/vexora-logo.svg" alt="Símbolo VEXORA" className="size-7 shrink-0 drop-shadow-[0_0_7px_#00d9ff]" />
             <h1 className="text-center font-display text-sm font-extrabold leading-none tracking-[0.12em] text-neon-green neon-text">VEXORA<br /><span className="text-neon-cyan">SAMPLER</span></h1>
           </div>
           <SidePanel selected={selected} />
           {st.show.editor && <AudioInfoPanel code={selected} ledActive={ledActive} onToggleLed={() => setLedActive((v) => !v)} />}
         </aside>
-        <section className="flex min-w-0 flex-col gap-1.5">
-          <div data-tauri-drag-region className="relative aspect-[3/1] min-h-0 w-full overflow-hidden rounded-none border-0" style={bannerWallStyle}>
+        <section className="flex min-w-0 flex-col gap-1">
+          <div data-tauri-drag-region className="relative h-10 min-h-10 w-full overflow-hidden rounded-none border-0" style={bannerWallStyle}>
             {(!wall || !w.enabled) && <div className="absolute inset-0 bg-background" />}
             {wall && w.enabled && <div className="absolute inset-0 bg-background" style={{ opacity: w.dim }} />}
             <div className="absolute right-1 top-1 z-10 flex gap-1">
