@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1536" height="512" viewBox="0 0 1536 512">
+<defs>
+ <linearGradient id="bg" x2="0" y2="1"><stop stop-color="#030817"/><stop offset=".52" stop-color="#071a40"/><stop offset="1" stop-color="#030613"/></linearGradient>
+ <linearGradient id="metal" x2="0" y2="1"><stop stop-color="#fff"/><stop offset=".28" stop-color="#8ba6d4"/><stop offset=".52" stop-color="#101b36"/><stop offset=".75" stop-color="#e8f5ff"/><stop offset="1" stop-color="#4768a8"/></linearGradient>
+ <linearGradient id="cyan"><stop stop-color="#087bff"/><stop offset=".5" stop-color="#00efff"/><stop offset="1" stop-color="#0960ff"/></linearGradient>
+ <linearGradient id="pink"><stop stop-color="#9d00ff"/><stop offset=".5" stop-color="#ff26dc"/><stop offset="1" stop-color="#8a22ff"/></linearGradient>
+ <radialGradient id="glow"><stop stop-color="#003baf" stop-opacity=".75"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient>
+ <filter id="glowFx" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="7" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+ <filter id="shadow"><feGaussianBlur stdDeviation="5"/></filter>
+</defs>
+<rect width="1536" height="512" fill="url(#bg)"/><ellipse cx="770" cy="250" rx="650" ry="260" fill="url(#glow)"/>
+<!-- stage beams -->
+<g opacity=".8" stroke-width="8" filter="url(#glowFx)"><path d="M0 35 L360 185 M0 145 L420 220 M1536 35 L1176 185 M1536 145 L1116 220" stroke="url(#cyan)"/><path d="M180 0 L520 200 M1356 0 L1016 200" stroke="url(#pink)"/></g>
+<!-- equalizers -->
+<g fill="#00d9ff" opacity=".88"><path d="M85 280h18v-45H85z M110 280h18v-82h-18z M135 280h18v-118h-18z M160 280h18v-95h-18z M185 280h18v-64h-18z M210 280h18v-42h-18z M235 280h18v-86h-18z M260 280h18v-111h-18z M285 280h18v-74h-18z"/></g>
+<g fill="#ef21ff" opacity=".9"><path d="M1251 280h18v-56h-18z M1276 280h18v-93h-18z M1301 280h18v-128h-18z M1326 280h18v-108h-18z M1351 280h18v-71h-18z M1376 280h18v-46h-18z M1401 280h18v-84h-18z M1426 280h18v-115h-18z"/></g>
+<!-- speaker circles -->
+<g fill="#050b1c" stroke="url(#cyan)" stroke-width="8" filter="url(#glowFx)"><circle cx="120" cy="170" r="78"/><circle cx="1416" cy="170" r="78"/></g>
+<g fill="#101a33" stroke="#6fefff" stroke-width="3"><circle cx="120" cy="170" r="55"/><circle cx="1416" cy="170" r="55"/><circle cx="120" cy="170" r="24"/><circle cx="1416" cy="170" r="24"/></g>
+<!-- V crest -->
+<path d="M420 52 L590 52 L770 250 L946 52 L1115 52 L770 356 Z" fill="#020817" stroke="url(#cyan)" stroke-width="9" filter="url(#glowFx)"/>
+<path d="M470 66 L600 66 L770 247 L936 66 L1064 66 L770 323 Z" fill="url(#metal)" stroke="#151f43" stroke-width="10"/>
+<path d="M560 75 L640 75 L770 215 L900 75 L980 75 L770 300 Z" fill="#020818" stroke="#08bfff" stroke-width="4"/>
+<!-- main title -->
+<text x="768" y="322" font-family="Arial Black, Impact, sans-serif" font-size="120" font-weight="900" text-anchor="middle" letter-spacing="-5" fill="#020713" stroke="#00bfff" stroke-width="15" paint-order="stroke">VEXORA</text>
+<text x="768" y="315" font-family="Arial Black, Impact, sans-serif" font-size="120" font-weight="900" text-anchor="middle" letter-spacing="-5" fill="url(#metal)" stroke="#06152d" stroke-width="5" paint-order="stroke">VEXORA</text>
+<text x="768" y="389" font-family="Arial Black, Impact, sans-serif" font-size="76" font-weight="900" text-anchor="middle" letter-spacing="2" fill="#031022" stroke="#00dfff" stroke-width="9" paint-order="stroke">SAMPLER</text>
+<text x="768" y="383" font-family="Arial Black, Impact, sans-serif" font-size="76" font-weight="900" text-anchor="middle" letter-spacing="2" fill="url(#metal)" stroke="#102450" stroke-width="3" paint-order="stroke">SAMPLER</text>
+<!-- contact footer -->
+<rect x="26" y="420" width="1484" height="70" rx="20" fill="#020817" stroke="#00dfff" stroke-width="3" filter="url(#glowFx)"/>
+<path d="M55 458h22v-17h10v30h10v-39h10v49h10v-34h10v22h10v-15h16" fill="none" stroke="#00efff" stroke-width="7"/>
+<path d="M1380 458h22v-17h10v30h10v-39h10v49h10v-34h10v22h10v-15h16" fill="none" stroke="#ef21ff" stroke-width="7"/>
+<text x="230" y="464" font-family="Arial, sans-serif" font-size="27" font-weight="800" fill="#fff">CRIADO POR</text>
+<text x="425" y="464" font-family="Arial, sans-serif" font-size="27" font-weight="900" fill="#00eaff">NEYZINHO DAS PRODUÇÕES</text>
+<path d="M832 437v36" stroke="#d6f7ff" stroke-width="3"/>
+<circle cx="884" cy="455" r="22" fill="#00c96b" stroke="#b6ffe1" stroke-width="2"/>
+<text x="884" y="465" font-family="Arial, sans-serif" font-size="28" font-weight="900" text-anchor="middle" fill="#fff">☎</text>
+<text x="918" y="464" font-family="Arial, sans-serif" font-size="31" font-weight="900" fill="#fff">(91) 9 9358-4049</text>
+</svg>
