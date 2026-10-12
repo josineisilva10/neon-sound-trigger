@@ -159,6 +159,9 @@
     overflow: hidden;
   }
   .keyboard-fit-panel .padkey {
+    flex: var(--w, 1) 1 0%;
+    width: auto;
+    min-width: 0;
     min-width: 0;
     padding: clamp(3px, 0.45cqi, 7px);
     border-radius: 0.55rem;
