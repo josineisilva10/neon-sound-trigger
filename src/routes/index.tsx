@@ -17,12 +17,12 @@ import { Waveform } from "@/components/vexora/Meters";
 
 export const Route = createFileRoute("/")({
   head: () => ({
+    links: [{ rel: "icon", type: "image/svg+xml", href: "/vexora-logo.svg" }],
     meta: [
       { title: "VEXORA SAMPLER — Disparo de áudio para DJs" },
       { name: "description", content: "VEXORA SAMPLER: sampler profissional para DJs com bancos, vinhetas, locuções, efeitos e papel de parede personalizado." },
       { property: "og:title", content: "VEXORA SAMPLER" },
       { property: "og:description", content: "VEXORA — painel profissional para disparo de vinhetas, locuções e efeitos para DJs." },
-      { rel: "icon", type: "image/svg+xml", href: "/vexora-logo.svg" },
     ],
   }),
   component: App,
