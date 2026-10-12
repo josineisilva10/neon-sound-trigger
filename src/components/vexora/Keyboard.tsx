@@ -50,7 +50,7 @@ export function KeyboardPanel({ selected, onSelect, editMode }: Props) {
 
   // Keep the keyboard large while scaling its keys to fit the available width.
   // The parent layout provides the container query width (cqi).
-  const unit = `clamp(1.5rem, calc((100cqi - 7rem) / 30), ${4.2 * st.padScale}rem)`;
+  const unit = `clamp(1.8rem, calc((100cqi - 8rem) / 23), ${4.5 * st.padScale}rem)`;
 
   if (st.view === "grid") {
     const codes = layoutCodes(st.layout).filter((c) => bank.pads[c]);
@@ -68,13 +68,12 @@ export function KeyboardPanel({ selected, onSelect, editMode }: Props) {
     );
   }
 
-  // Compact 70% layout: remove Caps Lock and the bottom-row modifier keys
-  // requested, while preserving letters, number row, function keys and arrows.
+  // Compact layout: remove Caps Lock, both Shift keys and bottom-row modifiers.
+  // Keep the rows aligned and leave only the space bar on the bottom row.
   const compactRows = mainRows(st.layout).map((row, index) => {
     if (index === 2) return row.filter((key) => !("code" in key) || key.code !== "CapsLock");
-    if (index === 4) return row.filter((key) =>
-      "code" in key && key.code === "Space"
-    );
+    if (index === 3) return row.filter((key) => !("code" in key) || (key.code !== "ShiftLeft" && key.code !== "ShiftRight"));
+    if (index === 4) return row.filter((key) => "code" in key && key.code === "Space");
     return row;
   });
 
