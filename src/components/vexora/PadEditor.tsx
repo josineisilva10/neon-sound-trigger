@@ -7,12 +7,12 @@ import { AUDIO_EXT, importAudioFiles, stopPad, trigger } from "@/lib/vexora/acti
 import { Waveform } from "./Meters";
 
 export const Field = ({ label, children }: { label: string; children: React.ReactNode }) => (
-  <label className="flex flex-col gap-0.5 text-[10px] text-muted-foreground">
+  <label className="flex flex-col gap-0.5 text-[8px] text-muted-foreground">
     <span className="uppercase tracking-wider">{label}</span>
     {children}
   </label>
 );
-export const inputCls = "rounded-md border border-input bg-background/70 px-2 py-1 text-xs text-foreground outline-none focus:border-ring";
+export const inputCls = "rounded-md border border-input bg-background/70 px-1.5 py-0.5 text-[10px] text-foreground outline-none focus:border-ring";
 
 export function PadEditor({ code }: { code: string | null }) {
   const s = useAppState();
@@ -25,14 +25,14 @@ export function PadEditor({ code }: { code: string | null }) {
   const set = (patch: Partial<Pad>) => updatePad(bank.id, code, patch);
 
   return (
-    <div className="panel space-y-1 p-1 sm:p-1.5">
-      <div className="flex flex-wrap items-center gap-1">
+    <div className="panel space-y-0.5 p-1">
+      <div className="flex flex-wrap items-center gap-0.5">
         <span className="rounded-md border px-1.5 py-0 font-display text-sm font-bold neon-text" style={{ color: p.color, borderColor: p.color }}>{keyLabel(code, s.settings.layout)}</span>
         <input className={inputCls + " min-w-40 flex-1 py-1 text-xs"} placeholder="Nome do pad" value={p.name} onChange={(e) => set({ name: e.target.value })} />
-        <button className="btn" onClick={() => trigger(bank.id, code)} disabled={!p.fileId}><Play className="size-4" /> Tocar</button>
-        <button className="btn" onClick={() => stopPad(bank.id, code)}><Square className="size-4" /> Parar</button>
-        <button className="btn" onClick={() => fileRef.current?.click()}><Upload className="size-4" /> {p.fileId ? "Substituir áudio" : "Carregar áudio"}</button>
-        {pad && <button className="btn text-destructive" onClick={() => clearPad(bank.id, code)}><Eraser className="size-4" /> Limpar</button>}
+        <button className="btn !px-1.5 !py-0.5 text-[10px]" onClick={() => trigger(bank.id, code)} disabled={!p.fileId}><Play className="size-4" /> Tocar</button>
+        <button className="btn !px-1.5 !py-0.5 text-[10px]" onClick={() => stopPad(bank.id, code)}><Square className="size-4" /> Parar</button>
+        <button className="btn !px-1.5 !py-0.5 text-[10px]" onClick={() => fileRef.current?.click()}><Upload className="size-4" /> {p.fileId ? "Substituir áudio" : "Carregar áudio"}</button>
+        {pad && <button className="btn !px-1.5 !py-0.5 text-[10px] text-destructive" onClick={() => clearPad(bank.id, code)}><Eraser className="size-4" /> Limpar</button>}
         <input ref={fileRef} type="file" hidden accept={AUDIO_EXT.map((e) => "." + e).join(",")} onChange={async (e) => {
           const f = e.target.files?.[0];
           e.target.value = "";
@@ -42,7 +42,7 @@ export function PadEditor({ code }: { code: string | null }) {
         }} />
       </div>
 
-      <div className="grid gap-1 md:grid-cols-[1fr_auto]">
+      <div className="grid gap-0.5 md:grid-cols-[minmax(0,1fr)_auto]">
         <Field label={item ? `${item.name} · ${item.format} · ${fmtTime(item.duration)}${item.missing ? " · ARQUIVO AUSENTE" : ""}` : "Arquivo"}>
           <select className={inputCls} value={p.fileId ?? ""} onChange={(e) => set({ fileId: e.target.value || null })}>
             <option value="">— nenhum —</option>
@@ -53,9 +53,9 @@ export function PadEditor({ code }: { code: string | null }) {
           {PAD_COLORS.map((c) => <button key={c} aria-label={`Cor ${c}`} onClick={() => set({ color: c, playColor: c })} className="size-4 rounded-full border" style={{ background: c, borderColor: p.color === c ? "var(--foreground)" : "transparent" }} />)}
         </div>
       </div>
-      {item && <Waveform peaks={item.peaks} color={p.color} height={18} />}
+      {item && <Waveform peaks={item.peaks} color={p.color} height={8} />}
 
-      <div className="grid grid-cols-3 gap-1 sm:grid-cols-4 lg:grid-cols-6 2xl:grid-cols-12">
+      <div className="grid grid-cols-4 gap-0.5 sm:grid-cols-6 lg:grid-cols-12">
         <Field label="Modo"><select className={inputCls} value={p.mode} onChange={(e) => set({ mode: e.target.value as Pad["mode"] })}><option value="once">Tocar uma vez</option><option value="loop">Repetir (loop)</option></select></Field>
         <Field label="Ao repetir tecla"><select className={inputCls} value={p.retrigger} onChange={(e) => set({ retrigger: e.target.value as Pad["retrigger"] })}><option value="restart">Reiniciar</option><option value="stop">Parar</option><option value="overlap">Sobrepor</option><option value="ignore">Ignorar</option></select></Field>
         <Field label="Grupo exclusivo"><input className={inputCls} placeholder="ex: música" value={p.group} onChange={(e) => set({ group: e.target.value })} /></Field>
