@@ -100,7 +100,6 @@ function App() {
             <h1 className="text-center font-display text-lg font-extrabold leading-none tracking-[0.16em] text-neon-green neon-text">VEXORA<br /><span className="text-neon-cyan">SAMPLER</span></h1>
           </div>
           <SidePanel selected={selected} />
-          {st.show.editor && <PadEditor code={selected} />}
         </aside>
         <section className="flex min-w-0 flex-col gap-1.5">
           <div className="relative min-h-[180px] overflow-hidden rounded-md border border-border sm:min-h-[230px] lg:min-h-[31vh]" style={wallStyle}>
@@ -111,6 +110,7 @@ function App() {
               <button className="btn !p-1.5" onClick={() => windowControl("max")} aria-label="Maximizar"><Maximize2 className="size-4" /></button>
             </div>
           </div>
+          {st.show.editor && <PadEditor code={selected} />}
           <KeyboardPanel selected={selected} onSelect={setSelected} editMode={editMode} />
         </section>
       </main>
