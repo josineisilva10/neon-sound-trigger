@@ -111,12 +111,10 @@ function App() {
           </div>
         </div>
       </header>
-      <main className="grid gap-3 p-3 lg:grid-cols-[260px_minmax(0,1fr)]">
+      <main className="flex min-w-0 flex-col gap-2 p-2">
         <SidePanel selected={selected} />
-        <div className="flex min-w-0 flex-col gap-3">
-          <KeyboardPanel selected={selected} onSelect={setSelected} editMode={editMode} />
-          {st.show.editor && <PadEditor code={selected} />}
-        </div>
+        {st.show.editor && <PadEditor code={selected} />}
+        <KeyboardPanel selected={selected} onSelect={setSelected} editMode={editMode} />
       </main>
       {showSettings && <SettingsDialog onClose={() => setShowSettings(false)} />}
     </div>
