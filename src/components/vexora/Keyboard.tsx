@@ -51,7 +51,7 @@ export function KeyboardPanel({ selected, onSelect, editMode }: Props) {
 
   // Keep the keyboard large while scaling its keys to fit the available width.
   // The parent layout provides the container query width (cqi).
-  const unit = `clamp(2.1rem, calc((100cqi - 1.5rem) / 20), ${4.4 * st.padScale}rem)`;
+  const unit = `clamp(2.45rem, calc((100cqi - 0.5rem) / 20), ${4.8 * st.padScale}rem)`;
 
   if (st.view === "grid") {
     const codes = layoutCodes(st.layout).filter((c) => bank.pads[c]);
@@ -80,12 +80,12 @@ export function KeyboardPanel({ selected, onSelect, editMode }: Props) {
 
   return (
     <div className="panel keyboard-fit-panel p-2 sm:p-3" style={{ ["--u" as string]: unit }}>
-      <div className="flex w-full min-w-0 items-start gap-1">
-        <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+      <div className="flex w-full min-w-0 items-start gap-0.5">
+        <div className="flex min-w-0 flex-1 flex-col gap-0">
           {st.show.fn && <div className="mb-2">{renderRows([FUNCTION_ROW])}</div>}
           {renderRows(compactRows)}
         </div>
-        {st.show.nav && <div className="flex flex-none flex-col gap-0.5">{st.show.fn && <div className="mb-2 h-[var(--u)]" />}{renderRows(NAV_ROWS)}</div>}
+        {st.show.nav && <div className="flex flex-none flex-col gap-0">{st.show.fn && <div className="mb-2 h-[var(--u)]" />}{renderRows(NAV_ROWS)}</div>}
       </div>
     </div>
   );
@@ -133,7 +133,7 @@ function PadKey({ code, w, pad, lib, selected, reserved, playing, label, barRef,
       onMouseDown={(e) => e.preventDefault()}
       onClick={onClick}
       onDoubleClick={onDoubleClick}
-      className="padkey px-1.5 py-1"
+      className="padkey px-1.5 py-1.5"
       data-assigned={assigned || undefined}
       data-playing={playing || undefined}
       data-selected={selected || undefined}
@@ -143,12 +143,12 @@ function PadKey({ code, w, pad, lib, selected, reserved, playing, label, barRef,
       style={{ ["--w" as string]: w, ["--led" as string]: playing ? p.playColor : p.color, ["--b" as string]: p.brightness, ["--s" as string]: `${p.speed}s` }}
     >
       <div className="flex items-center justify-between gap-1">
-        <span className="font-display text-[11px] font-bold leading-none" style={{ color: assigned ? p.color : undefined }}>{label}</span>
+        <span className="font-display text-xs font-bold leading-none sm:text-sm" style={{ color: assigned ? p.color : undefined }}>{label}</span>
         {playing && <span className="led-dot led-anim animate-pulse" />}
       </div>
       {assigned && (
         <>
-          <div className="mt-0.5 truncate text-[11px] font-semibold leading-tight">{pad?.name || item?.name || "—"}</div>
+          <div className="mt-0.5 truncate text-xs font-semibold leading-tight sm:text-sm">{pad?.name || item?.name || "—"}</div>
           <div className="font-mono text-[9px] text-muted-foreground">{item?.missing ? "AUSENTE" : fmtTime(item?.duration ?? 0)}{p.mode === "loop" ? " ⟳" : ""}</div>
         </>
       )}
