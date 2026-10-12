@@ -68,15 +68,14 @@ export function KeyboardPanel({ selected, onSelect, editMode }: Props) {
     );
   }
 
-  // Compact 70% layout: keep the full alphanumeric keyboard, function row,
-  // and navigation cluster, while removing the numeric keypad.
+  // Compact 70% layout: remove Caps Lock and the bottom-row modifier keys
+  // requested, while preserving letters, number row, function keys and arrows.
   const compactRows = mainRows(st.layout).map((row, index) => {
-    if (index !== 4) return row;
-    return row.filter((key) =>
-      "code" in key && [
-        "ControlLeft", "MetaLeft", "AltLeft", "Space", "AltRight", "MetaRight",
-      ].includes(key.code)
+    if (index === 2) return row.filter((key) => !("code" in key) || key.code !== "CapsLock");
+    if (index === 4) return row.filter((key) =>
+      "code" in key && key.code === "Space"
     );
+    return row;
   });
 
   return (
