@@ -25,36 +25,11 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Set up Python for VEXORA icon
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.x"
-
       - name: Generate VEXORA Windows icon
         shell: pwsh
         run: |
-          python -m pip install --upgrade pip
-          python -m pip install pillow
-          npm install --no-save @resvg/resvg-js
           New-Item -ItemType Directory -Force -Path "src-tauri/icons" | Out-Null
-          @'
-          const fs = require("node:fs");
-          const { Resvg } = require("@resvg/resvg-js");
-          const svg = fs.readFileSync("public/vexora-logo.svg", "utf8");
-          const png = new Resvg(svg, { fitTo: { mode: "width", value: 256 } }).render().asPng();
-          fs.writeFileSync("vexora-icon.png", png);
-          '@ | Set-Content -Encoding utf8 generate_icon.cjs
-          node generate_icon.cjs
-          @'
-          from PIL import Image
-          image = Image.open("vexora-icon.png").convert("RGBA")
-          image.save("src-tauri/icons/icon.ico", format="ICO", sizes=[(16,16),(24,24),(32,32),(48,48),(64,64),(128,128),(256,256)])
-          '@ | Set-Content -Encoding utf8 make_ico.py
-          python make_ico.py
-          if (-not (Test-Path "src-tauri/icons/icon.ico")) {
-            Write-Error "O ícone do VEXORA não foi gerado."
-            exit 1
-          }
+          Copy-Item "public/favicon.ico" "src-tauri/icons/icon.ico" -Force
 
       - name: Install frontend dependencies
         run: bun install --frozen-lockfile
