@@ -110,8 +110,8 @@ function App() {
               <button className="btn !p-1.5" onClick={() => windowControl("max")} aria-label="Maximizar"><Maximize2 className="size-4" /></button>
             </div>
           </div>
-          {st.show.editor && <PadEditor code={selected} />}
           <KeyboardPanel selected={selected} onSelect={setSelected} editMode={editMode} />
+          {st.show.editor && <PadEditor code={selected} />
         </section>
       </main>
       {showSettings && <SettingsDialog onClose={() => setShowSettings(false)} />}
