@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { Toaster } from "sonner";
 import { Maximize2, Settings as Cog, Play, Square, Repeat2, Scissors, Gauge, Volume2, SlidersHorizontal, Star, Music2 } from "lucide-react";
 import { engine } from "@/lib/vexora/engine";
@@ -29,7 +29,7 @@ export const Route = createFileRoute("/")({
 
 const FIT = { fill: "cover", fit: "contain", center: "auto", zoom: "160%" } as const;
 
-function AudioInfoPanel({ code }: { code: string | null }) {
+function AudioInfoPanel({ code, ledActive, onToggleLed }: { code: string | null; ledActive: boolean; onToggleLed: () => void }) {
   const s = useAppState();
   const bank = activeBank(s);
   const pad = code ? bank.pads[code] : undefined;
@@ -55,7 +55,7 @@ function AudioInfoPanel({ code }: { code: string | null }) {
     { label: pad?.mode === "loop" ? "REPETIR: ON" : "REPETIR", icon: Repeat2, color: "text-neon-green", border: "border-neon-green/50", onClick: toggleLoop, title: "Alternar repetição" },
     { label: `VELOC. ${(pad?.speed ?? 1).toFixed(2)}×`, icon: Gauge, color: "text-neon-orange", border: "border-neon-orange/50", onClick: cycleSpeed, title: "Alterar velocidade do pad" },
     { label: "NORMALIZAR", icon: Volume2, color: "text-neon-purple", border: "border-neon-purple/50", onClick: () => { if (code) void normalizePadAudio(bank.id, code); }, title: "Normalizar volume do áudio" },
-    { label: "EQUALIZADOR", icon: SlidersHorizontal, color: "text-neon-cyan", border: "border-neon-cyan/50", onClick: undefined, title: "Equalizador ainda não implementado" },
+    { label: ledActive ? "LED ATIVO: ON" : "LED ATIVO", icon: SlidersHorizontal, color: "text-neon-cyan", border: "border-neon-cyan/50", onClick: onToggleLed, title: "Ativar visualizador LED durante a reprodução" },
     { label: favorite ? "FAVORITO ★" : "FAVORITO", icon: Star, color: favorite ? "text-neon-orange" : "text-neon-red", border: "border-neon-red/50", onClick: () => setFavorite(!favorite), title: "Marcar como favorito" },
   ];
 
@@ -136,6 +136,50 @@ function AudioInfoPanel({ code }: { code: string | null }) {
   );
 }
 
+function LedVisualizer({ onBack }: { onBack: () => void }) {
+  useSyncExternalStore(engine.subscribe, engine.getVersion, engine.getVersion);
+  const [levels, setLevels] = useState<number[]>(() => Array.from({ length: 48 }, () => 0.08));
+
+  useEffect(() => {
+    let raf = 0;
+    const draw = () => {
+      const active = engine.voices.size > 0 && !engine.paused;
+      const spectrum = active ? engine.spectrum(48) : Array.from({ length: 48 }, () => 0.025);
+      setLevels((previous) => spectrum.map((v, i) => Math.max(v, (previous[i] ?? 0) * 0.82, active ? 0.04 : 0.025)));
+      raf = requestAnimationFrame(draw);
+    };
+    raf = requestAnimationFrame(draw);
+    return () => cancelAnimationFrame(raf);
+  }, []);
+
+  return (
+    <div className="panel relative flex min-h-[280px] flex-col overflow-hidden border-neon-cyan/60 bg-[#030916] p-3 sm:min-h-[340px] lg:min-h-[42vh]">
+      <div className="mb-3 flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
+          <span className="size-2 animate-pulse rounded-full bg-neon-green shadow-[0_0_12px_#39ff88]" />
+          <h2 className="font-display text-sm font-extrabold tracking-widest text-neon-cyan neon-text sm:text-lg">LED ATIVO</h2>
+        </div>
+        <button className="btn !px-2 !py-1.5 text-xs" onClick={onBack}>⌨ VOLTAR AO TECLADO</button>
+      </div>
+      <div className="relative flex min-h-0 flex-1 items-end justify-around gap-[2px] overflow-hidden rounded-md border border-cyan-500/30 bg-gradient-to-b from-slate-950 via-[#071a2b] to-[#020611] px-2 pb-5 pt-4">
+        <div className="pointer-events-none absolute inset-0 opacity-30" style={{ backgroundImage: "linear-gradient(rgba(34,211,238,.25) 1px, transparent 1px)", backgroundSize: "100% 12px" }} />
+        {levels.map((level, i) => {
+          const h = Math.max(3, Math.min(100, 7 + level * 115));
+          const color = level > 0.68 ? "#ff3b5c" : level > 0.43 ? "#ffb52e" : level > 0.2 ? "#22d3ee" : "#1683ff";
+          return <div key={i} className="relative flex h-full max-w-4 flex-1 flex-col justify-end gap-[3px]" style={{ filter: `drop-shadow(0 0 4px ${color})` }}>
+            {Array.from({ length: 16 }, (_, j) => {
+              const lit = (j + 1) / 16 <= h / 100;
+              return <div key={j} className="min-h-[3px] flex-1 rounded-[1px] transition-colors duration-75" style={{ background: lit ? color : "rgba(30,64,91,.25)", opacity: lit ? 0.95 : 1 }} />;
+            })}
+          </div>;
+        })}
+        <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-4 bg-gradient-to-t from-cyan-400/20 to-transparent" />
+      </div>
+      <div className="mt-2 flex justify-between font-mono text-[9px] text-cyan-200/70"><span>LOW</span><span>FREQUENCY SPECTRUM</span><span>HIGH</span></div>
+    </div>
+  );
+}
+
 function App() {
   const s = useAppState();
   const st = s.settings;
@@ -143,7 +187,7 @@ function App() {
   const [editMode, setEditMode] = useState(false);
   const [armed, setArmed] = useState(true);
   const [showSettings, setShowSettings] = useState(false);
-  const [wall, setWall] = useState<string | null>(null);
+  const [wall, setWall] = useState<string | null>(null);\n  const [ledActive, setLedActive] = useState(false);\n  useSyncExternalStore(engine.subscribe, engine.getVersion, engine.getVersion);\n  const audioPlaying = [...engine.voices.values()].some((v) => v.key.startsWith(`${s.activeBank}:`));
 
   useEffect(() => {
     store.hydrate(detectLayout());
@@ -209,7 +253,7 @@ function App() {
             <h1 className="text-center font-display text-lg font-extrabold leading-none tracking-[0.16em] text-neon-green neon-text">ZENTRIX<br /><span className="text-neon-cyan">SAMPLER</span></h1>
           </div>
           <SidePanel selected={selected} />
-          {st.show.editor && <AudioInfoPanel code={selected} />}
+          {st.show.editor && <AudioInfoPanel code={selected} ledActive={ledActive} onToggleLed={() => setLedActive((v) => !v)} />}
         </aside>
         <section className="flex min-w-0 flex-col gap-1.5">
           <div className="relative min-h-[180px] overflow-hidden rounded-md border border-border sm:min-h-[230px] lg:min-h-[31vh]" style={wallStyle}>
@@ -220,7 +264,7 @@ function App() {
               <button className="btn !p-1.5" onClick={() => windowControl("max")} aria-label="Maximizar"><Maximize2 className="size-4" /></button>
             </div>
           </div>
-          <KeyboardPanel selected={selected} onSelect={setSelected} editMode={editMode} />
+          {ledActive && audioPlaying ? <LedVisualizer onBack={() => setLedActive(false)} /> : <KeyboardPanel selected={selected} onSelect={setSelected} editMode={editMode} />}
           {st.show.editor && <PadEditor code={selected} />}
         </section>
       </main>
