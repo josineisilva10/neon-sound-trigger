@@ -42,9 +42,10 @@ export async function unregisterGlobalShortcuts() {
 
 export function windowControl(action: "min" | "max" | "close") {
   const api = tauri();
-  if (action === "max" && api?.core?.invoke) {
-    return api.core.invoke("toggle_maximize").catch((error) => {
-      console.error("Não foi possível maximizar a janela do VEXORA SAMPLER:", error);
+  if (api?.core?.invoke) {
+    const command = action === "max" ? "toggle_maximize" : action === "min" ? "minimize_window" : "close_window";
+    return api.core.invoke(command).catch((error) => {
+      console.error(`Não foi possível executar "${action}" no VEXORA SAMPLER:`, error);
     });
   }
   if (action === "max") {
