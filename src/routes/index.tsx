@@ -95,8 +95,8 @@ function App() {
       <Toaster theme="dark" position="bottom-right" richColors />
       <header className="relative overflow-hidden border-b border-border" style={w.target === "header" ? wallStyle : undefined}>
         {wallStyle && w.target === "header" && <div className="absolute inset-0 bg-background" style={{ opacity: w.dim }} />}
-        <div className="relative flex flex-wrap items-center gap-3 px-4 py-2">
-          <h1 className="font-display text-xl font-extrabold tracking-[0.25em] text-neon-green neon-text">VEXORA <span className="text-neon-cyan">SAMPLER</span></h1>
+        <div className="relative flex flex-wrap items-center gap-2 px-2 py-1">
+          <h1 className="font-display text-base font-extrabold tracking-[0.2em] text-neon-green neon-text">VEXORA <span className="text-neon-cyan">SAMPLER</span></h1>
           <div className="flex flex-wrap gap-1">
             {s.banks.map((b) => <button key={b.id} onClick={() => switchBank(b.id)} className={`rounded border px-2 py-0.5 text-xs font-bold ${b.id === s.activeBank ? "border-neon-orange text-neon-orange neon-text" : "border-border text-muted-foreground"}`}>{b.name}</button>)}
           </div>
@@ -117,7 +117,7 @@ function App() {
           {st.show.editor && <PadEditor code={selected} />}
         </aside>
         <section className="flex min-w-0 flex-col gap-2">
-          <div className="relative min-h-[180px] overflow-hidden rounded-md border border-border sm:min-h-[230px] lg:min-h-[32vh]" style={wallStyle}>
+          <div className="relative min-h-[180px] overflow-hidden rounded-md border border-border sm:min-h-[230px] lg:min-h-[30vh]" style={wallStyle}>
             {(!wallStyle || w.target === "header") && <div className="absolute inset-0 bg-background/20" />}
             {wallStyle && w.target === "full" && <div className="absolute inset-0 bg-background" style={{ opacity: w.dim }} />}
           </div>
