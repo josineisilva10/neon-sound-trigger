@@ -61,7 +61,7 @@ function AudioInfoPanel({ code, ledActive, onToggleLed }: { code: string | null;
   ];
 
   return (
-    <div className="panel min-w-0 space-y-1 p-1">
+    <div className="panel min-w-0 space-y-0.5 p-0.5">
       <div className="flex items-center justify-between gap-1">
         <h2 className="font-display text-[10px] font-bold tracking-wide text-neon-cyan">INFORMAÇÕES DO ÁUDIO</h2>
         <span className="text-[8px] text-muted-foreground">{item ? "SELECIONADO" : "SEM ÁUDIO"}</span>
@@ -73,8 +73,8 @@ function AudioInfoPanel({ code, ledActive, onToggleLed }: { code: string | null;
         </div>
       ) : (
         <>
-          <div className="flex min-w-0 items-center gap-1.5 rounded-md border border-border bg-background/40 p-1">
-            <Music2 className="size-5 shrink-0 text-neon-cyan" />
+          <div className="flex min-w-0 items-center gap-1 rounded-md border border-border bg-background/40 p-0.5">
+            <Music2 className="size-4 shrink-0 text-neon-cyan" />
             <div className="min-w-0 flex-1">
               <div className="truncate text-[10px] font-semibold">{pad?.name || item.name}</div>
               <div className="text-[8px] text-muted-foreground">{fmtTime(item.duration)} · {item.format} · {(item.size / (1024 * 1024)).toFixed(1)} MB</div>
@@ -82,8 +82,8 @@ function AudioInfoPanel({ code, ledActive, onToggleLed }: { code: string | null;
             <button className="btn !p-1" title="Tocar áudio" onClick={() => code && trigger(bank.id, code)}><Play className="size-3" /></button>
             <button className="btn !p-1" title="Parar áudio" onClick={() => code && stopPad(bank.id, code)}><Square className="size-3" /></button>
           </div>
-          <div className="rounded-md border border-neon-cyan/30 bg-background/60 px-1.5 py-1">
-            <Waveform peaks={item.peaks} color={pad?.color || "#22d3ee"} height={30} />
+          <div className="rounded-md border border-neon-cyan/30 bg-background/60 px-1 py-0.5">
+            <Waveform peaks={item.peaks} color={pad?.color || "#22d3ee"} height={20} />
           </div>
           <div className="grid grid-cols-3 gap-1 text-[7px]">
             <div className="rounded border border-border bg-background/40 p-1"><span className="block text-muted-foreground">FORMATO</span><strong>{item.format}</strong></div>
@@ -123,10 +123,10 @@ function AudioInfoPanel({ code, ledActive, onToggleLed }: { code: string | null;
               </div>
             </div>
           )}
-          <div className="grid grid-cols-3 gap-1">
+          <div className="grid grid-cols-3 gap-0.5">
             {actions.map(({ label, icon: Icon, color, border, onClick, title }) => (
-              <button key={label} className={`flex min-h-10 flex-col items-center justify-center gap-0.5 rounded-md border bg-background/50 px-1 py-1 transition-colors hover:bg-muted/70 ${border} ${color}`} onClick={onClick} title={title} disabled={!onClick}>
-                <Icon className="size-3.5" />
+              <button key={label} className={`flex min-h-8 flex-col items-center justify-center gap-0 rounded-md border bg-background/50 px-0.5 py-0.5 transition-colors hover:bg-muted/70 ${border} ${color}`} onClick={onClick} title={title} disabled={!onClick}>
+                <Icon className="size-3" />
                 <span className="text-center text-[7px] font-bold leading-tight">{label}</span>
               </button>
             ))}
