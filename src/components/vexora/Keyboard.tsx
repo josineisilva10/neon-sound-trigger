@@ -36,7 +36,8 @@ export function KeyboardPanel({ selected, onSelect, editMode }: Props) {
     code, w, pad: bank.pads[code], lib, selected: selected === code, reserved: st.reserved.includes(code) || code === st.stopAllKey,
     playing: engine.isPlaying(`${bank.id}:${code}`), label: keyLabel(code, st.layout),
     barRef: (el: HTMLDivElement | null) => { if (el) bars.current.set(code, el); else bars.current.delete(code); },
-    onClick: () => { onSelect(code); if (!editMode) trigger(bank.id, code); },
+    onClick: () => onSelect(code),
+    onDoubleClick: () => { if (!editMode) trigger(bank.id, code); },
     onDropKey: (from: string) => swapPads(bank.id, from, code),
     onDropFile: (fileId: string) => { const l = lib.get(fileId); updatePad(bank.id, code, { fileId, name: bank.pads[code]?.name || l?.name || "" }); onSelect(code); },
   });
@@ -92,10 +93,10 @@ export function KeyboardPanel({ selected, onSelect, editMode }: Props) {
 
 interface KeyProps {
   code: string; w: number; pad?: Pad; lib: Map<string, LibItem>; selected: boolean; reserved: boolean; playing: boolean; label: string;
-  barRef: (el: HTMLDivElement | null) => void; onClick: () => void; onDropKey: (from: string) => void; onDropFile: (id: string) => void;
+  barRef: (el: HTMLDivElement | null) => void; onClick: () => void; onDoubleClick: () => void; onDropKey: (from: string) => void; onDropFile: (id: string) => void;
 }
 
-function PadKey({ code, w, pad, lib, selected, reserved, playing, label, barRef, onClick, onDropKey, onDropFile }: KeyProps) {
+function PadKey({ code, w, pad, lib, selected, reserved, playing, label, barRef, onClick, onDoubleClick, onDropKey, onDropFile }: KeyProps) {
   const p = pad ?? defaultPad();
   const item = pad?.fileId ? lib.get(pad.fileId) : undefined;
   const assigned = !!pad?.fileId;
@@ -131,6 +132,7 @@ function PadKey({ code, w, pad, lib, selected, reserved, playing, label, barRef,
       }}
       onMouseDown={(e) => e.preventDefault()}
       onClick={onClick}
+      onDoubleClick={onDoubleClick}
       className="padkey px-1.5 py-1"
       data-assigned={assigned || undefined}
       data-playing={playing || undefined}
