@@ -6,7 +6,7 @@ import { engine } from "@/lib/vexora/engine";
 import { getFile, requestPersistence } from "@/lib/vexora/db";
 import { detectLayout } from "@/lib/vexora/layout";
 import { activeBank, setSettings, store, updatePad, useAppState } from "@/lib/vexora/store";
-import { checkLibrary, preloadBank, switchBank, trigger, stopPad } from "@/lib/vexora/actions";
+import { checkLibrary, preloadBank, switchBank, trigger, stopPad, trimPadAudio, normalizePadAudio } from "@/lib/vexora/actions";
 import { isDesktop, registerGlobalShortcuts, unregisterGlobalShortcuts, windowControl } from "@/lib/vexora/desktop";
 import { KeyboardPanel } from "@/components/vexora/Keyboard";
 import { PadEditor } from "@/components/vexora/PadEditor";
@@ -35,6 +35,9 @@ function AudioInfoPanel({ code }: { code: string | null }) {
   const pad = code ? bank.pads[code] : undefined;
   const item = pad?.fileId ? s.library.find((l) => l.id === pad.fileId) : undefined;
   const [favorite, setFavorite] = useState(false);
+  const [showTrim, setShowTrim] = useState(false);
+  const [trimStart, setTrimStart] = useState(0);
+  const [trimEnd, setTrimEnd] = useState(0);
 
   const toggleLoop = () => {
     if (code) updatePad(bank.id, code, { mode: pad?.mode === "loop" ? "once" : "loop" });
@@ -48,10 +51,10 @@ function AudioInfoPanel({ code }: { code: string | null }) {
   };
 
   const actions = [
-    { label: "CORTAR", icon: Scissors, color: "text-neon-cyan", border: "border-neon-cyan/50", onClick: undefined, title: "Ferramenta de corte ainda não implementada" },
+    { label: "CORTAR", icon: Scissors, color: "text-neon-cyan", border: "border-neon-cyan/50", onClick: () => { setTrimStart(0); setTrimEnd(item?.duration ?? 0); setShowTrim(true); }, title: "Selecionar trecho para cortar" },
     { label: pad?.mode === "loop" ? "REPETIR: ON" : "REPETIR", icon: Repeat2, color: "text-neon-green", border: "border-neon-green/50", onClick: toggleLoop, title: "Alternar repetição" },
     { label: `VELOC. ${(pad?.speed ?? 1).toFixed(2)}×`, icon: Gauge, color: "text-neon-orange", border: "border-neon-orange/50", onClick: cycleSpeed, title: "Alterar velocidade do pad" },
-    { label: "NORMALIZAR", icon: Volume2, color: "text-neon-purple", border: "border-neon-purple/50", onClick: undefined, title: "Normalização ainda não implementada" },
+    { label: "NORMALIZAR", icon: Volume2, color: "text-neon-purple", border: "border-neon-purple/50", onClick: () => { if (code) void normalizePadAudio(bank.id, code); }, title: "Normalizar volume do áudio" },
     { label: "EQUALIZADOR", icon: SlidersHorizontal, color: "text-neon-cyan", border: "border-neon-cyan/50", onClick: undefined, title: "Equalizador ainda não implementado" },
     { label: favorite ? "FAVORITO ★" : "FAVORITO", icon: Star, color: favorite ? "text-neon-orange" : "text-neon-red", border: "border-neon-red/50", onClick: () => setFavorite(!favorite), title: "Marcar como favorito" },
   ];
@@ -86,6 +89,22 @@ function AudioInfoPanel({ code }: { code: string | null }) {
             <div className="rounded border border-border bg-background/40 p-1"><span className="block text-muted-foreground">DURAÇÃO</span><strong>{fmtTime(item.duration)}</strong></div>
             <div className="rounded border border-border bg-background/40 p-1"><span className="block text-muted-foreground">TAMANHO</span><strong>{(item.size / (1024 * 1024)).toFixed(1)} MB</strong></div>
           </div>
+          {showTrim && (
+            <div className="space-y-2 rounded-md border border-neon-cyan/50 bg-background/80 p-2">
+              <div className="flex items-center justify-between gap-2">
+                <strong className="text-[10px] text-neon-cyan">CORTAR ÁUDIO</strong>
+                <button className="btn !px-2 !py-1 text-[9px]" onClick={() => setShowTrim(false)}>Fechar</button>
+              </div>
+              <div className="text-[9px] text-muted-foreground">Escolha o trecho que deseja manter. O original será preservado como outro áudio.</div>
+              <label className="block text-[9px]">Início: {trimStart.toFixed(2)} s
+                <input className="w-full" type="range" min={0} max={Math.max(0.05, item.duration - 0.05)} step={0.05} value={Math.min(trimStart, Math.max(0, item.duration - 0.05))} onChange={(e) => setTrimStart(Math.min(+e.target.value, trimEnd - 0.05))} />
+              </label>
+              <label className="block text-[9px]">Fim: {trimEnd.toFixed(2)} s
+                <input className="w-full" type="range" min={Math.min(item.duration, trimStart + 0.05)} max={item.duration} step={0.05} value={Math.max(trimEnd, trimStart + 0.05)} onChange={(e) => setTrimEnd(+e.target.value)} />
+              </label>
+              <button className="btn w-full !py-1.5 text-[10px]" onClick={() => { if (code && trimEnd > trimStart) { void trimPadAudio(bank.id, code, trimStart, trimEnd); setShowTrim(false); } }}>Aplicar corte e criar áudio</button>
+            </div>
+          )}
           <div className="grid grid-cols-3 gap-1">
             {actions.map(({ label, icon: Icon, color, border, onClick, title }) => (
               <button key={label} className={`flex min-h-12 flex-col items-center justify-center gap-1 rounded-md border bg-background/50 px-1 py-1.5 transition-colors hover:bg-muted/70 ${border} ${color}`} onClick={onClick} title={title} disabled={!onClick}>
