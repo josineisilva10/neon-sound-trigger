@@ -240,7 +240,7 @@ function App() {
             <h1 className="text-center font-display text-sm font-extrabold leading-none tracking-[0.12em] text-neon-green neon-text">VEXORA<br /><span className="text-neon-cyan">SAMPLER</span></h1>
           </div>
           <SidePanel selected={selected} />
-          {st.show.editor && <AudioInfoPanel code={selected} ledActive={ledActive} onToggleLed={() => setLedActive((v) => !v)} />}
+          <AudioInfoPanel code={selected} ledActive={ledActive} onToggleLed={() => setLedActive((v) => !v)} />
         </aside>
         <section className="flex min-w-0 flex-col gap-1">
           <div data-tauri-drag-region className="relative h-10 min-h-10 w-full overflow-hidden rounded-none border-0" style={bannerWallStyle}>
