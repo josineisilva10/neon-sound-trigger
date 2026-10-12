@@ -224,3 +224,8 @@ body::-webkit-scrollbar {
 
 /* Desktop: keep the app flush to the webview edges and prevent a horizontal page overflow. */
 html, body, #root { width: 100%; max-width: 100%; margin: 0; overflow-x: clip; }
+
+
+/* Keep scrollable regions usable while hiding browser scrollbar chrome. */
+*, *::before, *::after { scrollbar-width: none; }
+*::-webkit-scrollbar { display: none; width: 0; height: 0; }
