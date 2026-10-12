@@ -44,14 +44,14 @@ export function KeyboardPanel({ selected, onSelect, editMode }: Props) {
 
   const renderRows = (rows: Row[]) =>
     rows.map((row, i) => (
-      <div key={i} className={`flex min-w-0 gap-0 ${row.length === 1 && "code" in row[0] && row[0].code === "Space" ? "justify-center" : ""}`}>
+      <div key={i} className={`flex min-w-0 gap-0.5 ${row.length === 1 && "code" in row[0] && row[0].code === "Space" ? "justify-center" : ""}`}>
         {row.map((k, j) => ("gap" in k ? <div key={j} style={{ width: `calc(var(--u) * ${k.gap})` }} className="flex-none" /> : <PadKey key={k.code} {...keyProps(k.code, k.w)} />))}
       </div>
     ));
 
   // Keep the keyboard large while scaling its keys to fit the available width.
   // The parent layout provides the container query width (cqi).
-  const unit = `clamp(2.5rem, calc((100cqi - 0.5rem) / 19), ${4.5 * st.padScale}rem)`;
+  const unit = `clamp(2.4rem, calc((100cqi - 1rem) / 17.5), ${4.5 * st.padScale}rem)`;
   const navUnit = unit;
 
   if (st.view === "grid") {
@@ -86,7 +86,7 @@ export function KeyboardPanel({ selected, onSelect, editMode }: Props) {
           {st.show.fn && <div className="mb-1">{renderRows([FUNCTION_ROW])}</div>}
           {renderRows(compactRows)}
         </div>
-        {st.show.nav && <div className="flex w-max flex-none flex-col gap-0" style={{ ["--u" as string]: navUnit, marginLeft: "-0.35rem" }}>{st.show.fn && <div className="mb-1 h-[var(--u)]" />}{renderRows(NAV_ROWS)}</div>}
+        {st.show.nav && <div className="flex w-max flex-none flex-col gap-0" style={{ ["--u" as string]: navUnit, marginLeft: "-0.75rem" }}>{st.show.fn && <div className="mb-1 h-[var(--u)]" />}{renderRows(NAV_ROWS)}</div>}
       </div>
     </div>
   );
