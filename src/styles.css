@@ -179,16 +179,20 @@
 
 
 @keyframes vexora-led-scroll {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
 }
 .vexora-led-track {
   display: flex;
   width: max-content;
-  min-width: 200%;
+  will-change: transform;
   animation: vexora-led-scroll 24s linear infinite;
+}
+.vexora-led-track > div {
+  flex: 0 0 auto;
+  white-space: nowrap;
 }
 .vexora-led-track:hover { animation-play-state: paused; }
 @media (prefers-reduced-motion: reduce) {
-  .vexora-led-track { animation: none; transform: none; min-width: 100%; }
+  .vexora-led-track { animation: none; transform: none; }
 }
