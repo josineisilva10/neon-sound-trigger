@@ -187,7 +187,10 @@ function App() {
   const [editMode, setEditMode] = useState(false);
   const [armed, setArmed] = useState(true);
   const [showSettings, setShowSettings] = useState(false);
-  const [wall, setWall] = useState<string | null>(null);\n  const [ledActive, setLedActive] = useState(false);\n  useSyncExternalStore(engine.subscribe, engine.getVersion, engine.getVersion);\n  const audioPlaying = [...engine.voices.values()].some((v) => v.key.startsWith(`${s.activeBank}:`));
+  const [wall, setWall] = useState<string | null>(null);
+  const [ledActive, setLedActive] = useState(false);
+  useSyncExternalStore(engine.subscribe, engine.getVersion, engine.getVersion);
+  const audioPlaying = [...engine.voices.values()].some((v) => v.key.startsWith(`${s.activeBank}:`));
 
   useEffect(() => {
     store.hydrate(detectLayout());
