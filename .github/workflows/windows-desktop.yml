@@ -46,7 +46,7 @@ jobs:
           }
 
       - name: Build Windows installers
-        run: bunx tauri build --bundles nsis,msi
+        run: bunx --package @tauri-apps/cli tauri build --bundles nsis,msi
 
       - name: Upload Windows installers
         uses: actions/upload-artifact@v4
