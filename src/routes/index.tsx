@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Toaster } from "sonner";
-import { Maximize2, Settings as Cog, Play, Square, Repeat2 } from "lucide-react";
+import { Maximize2, Settings as Cog, Play, Square, Repeat2, Scissors, Gauge, Volume2, SlidersHorizontal, Star, Music2 } from "lucide-react";
 import { engine } from "@/lib/vexora/engine";
 import { getFile, requestPersistence } from "@/lib/vexora/db";
 import { detectLayout } from "@/lib/vexora/layout";
@@ -34,35 +34,65 @@ function AudioInfoPanel({ code }: { code: string | null }) {
   const bank = activeBank(s);
   const pad = code ? bank.pads[code] : undefined;
   const item = pad?.fileId ? s.library.find((l) => l.id === pad.fileId) : undefined;
+  const [favorite, setFavorite] = useState(false);
+
+  const toggleLoop = () => {
+    if (code) updatePad(bank.id, code, { mode: pad?.mode === "loop" ? "once" : "loop" });
+  };
+  const cycleSpeed = () => {
+    if (!code) return;
+    const speeds = [0.5, 0.75, 1, 1.25, 1.5, 2];
+    const current = pad?.speed ?? 1;
+    const next = speeds.find((v) => v > current + 0.001) ?? speeds[0];
+    updatePad(bank.id, code, { speed: next });
+  };
+
+  const actions = [
+    { label: "CORTAR", icon: Scissors, color: "text-neon-cyan", border: "border-neon-cyan/50", onClick: undefined, title: "Ferramenta de corte ainda não implementada" },
+    { label: pad?.mode === "loop" ? "REPETIR: ON" : "REPETIR", icon: Repeat2, color: "text-neon-green", border: "border-neon-green/50", onClick: toggleLoop, title: "Alternar repetição" },
+    { label: `VELOC. ${(pad?.speed ?? 1).toFixed(2)}×`, icon: Gauge, color: "text-neon-orange", border: "border-neon-orange/50", onClick: cycleSpeed, title: "Alterar velocidade do pad" },
+    { label: "NORMALIZAR", icon: Volume2, color: "text-neon-purple", border: "border-neon-purple/50", onClick: undefined, title: "Normalização ainda não implementada" },
+    { label: "EQUALIZADOR", icon: SlidersHorizontal, color: "text-neon-cyan", border: "border-neon-cyan/50", onClick: undefined, title: "Equalizador ainda não implementado" },
+    { label: favorite ? "FAVORITO ★" : "FAVORITO", icon: Star, color: favorite ? "text-neon-orange" : "text-neon-red", border: "border-neon-red/50", onClick: () => setFavorite(!favorite), title: "Marcar como favorito" },
+  ];
 
   return (
-    <div className="panel min-w-0 space-y-2 p-2">
-      <div className="flex items-center justify-between gap-2">
-        <h2 className="font-display text-[10px] font-bold tracking-wider text-neon-cyan">INFORMAÇÕES DO ÁUDIO</h2>
-        <span className="text-[9px] text-muted-foreground">{item ? "FAIXA SELECIONADA" : "AGUARDANDO ÁUDIO"}</span>
+    <div className="panel min-w-0 space-y-1.5 p-1.5">
+      <div className="flex items-center justify-between gap-1">
+        <h2 className="font-display text-[10px] font-bold tracking-wide text-neon-cyan">INFORMAÇÕES DO ÁUDIO</h2>
+        <span className="text-[8px] text-muted-foreground">{item ? "SELECIONADO" : "SEM ÁUDIO"}</span>
       </div>
       {!item ? (
-        <p className="text-[10px] text-muted-foreground">{code ? "Esta tecla ainda não tem áudio atribuído." : "Selecione uma tecla com áudio para ver os detalhes."}</p>
+        <div className="flex min-h-16 items-center gap-2 rounded-md border border-border bg-background/40 p-2">
+          <Music2 className="size-5 text-neon-cyan" />
+          <p className="text-[10px] text-muted-foreground">{code ? "Esta tecla ainda não tem áudio." : "Selecione uma tecla com áudio para ver os detalhes."}</p>
+        </div>
       ) : (
         <>
-          <div className="flex min-w-0 items-center gap-2">
-            <div className="flex size-8 shrink-0 items-center justify-center rounded-md border border-neon-cyan/50 bg-neon-cyan/10 text-neon-cyan">♫</div>
+          <div className="flex min-w-0 items-center gap-2 rounded-md border border-border bg-background/40 p-1.5">
+            <Music2 className="size-5 shrink-0 text-neon-cyan" />
             <div className="min-w-0 flex-1">
-              <div className="truncate text-xs font-semibold">{pad?.name || item.name}</div>
-              <div className="text-[9px] text-muted-foreground">{fmtTime(item.duration)} · {item.format} · {(item.size / (1024 * 1024)).toFixed(1)} MB</div>
+              <div className="truncate text-[10px] font-semibold">{pad?.name || item.name}</div>
+              <div className="text-[8px] text-muted-foreground">{fmtTime(item.duration)} · {item.format} · {(item.size / (1024 * 1024)).toFixed(1)} MB</div>
             </div>
-            <button className="btn !p-1.5" title="Tocar áudio" onClick={() => code && trigger(bank.id, code)}><Play className="size-3.5" /></button>
-            <button className="btn !p-1.5" title="Parar áudio" onClick={() => code && stopPad(bank.id, code)}><Square className="size-3.5" /></button>
+            <button className="btn !p-1" title="Tocar áudio" onClick={() => code && trigger(bank.id, code)}><Play className="size-3" /></button>
+            <button className="btn !p-1" title="Parar áudio" onClick={() => code && stopPad(bank.id, code)}><Square className="size-3" /></button>
           </div>
-          <div className="rounded-md border border-border bg-background/60 p-1.5">
-            <Waveform peaks={item.peaks} color={pad?.color || "#22d3ee"} height={28} />
+          <div className="rounded-md border border-neon-cyan/30 bg-background/60 px-1.5 py-1">
+            <Waveform peaks={item.peaks} color={pad?.color || "#22d3ee"} height={30} />
           </div>
-          <div className="grid grid-cols-3 gap-1 text-[9px]">
-            <div className="rounded border border-border p-1"><span className="block text-muted-foreground">FORMATO</span><strong>{item.format}</strong></div>
-            <div className="rounded border border-border p-1"><span className="block text-muted-foreground">DURAÇÃO</span><strong>{fmtTime(item.duration)}</strong></div>
-            <button className={`btn !justify-center !px-1 !py-1 text-[9px] ${pad?.mode === "loop" ? "text-neon-green" : ""}`} onClick={() => code && updatePad(bank.id, code, { mode: pad?.mode === "loop" ? "once" : "loop" })} title="Alternar repetição">
-              <Repeat2 className="size-3" /> {pad?.mode === "loop" ? "LOOP ON" : "REPETIR"}
-            </button>
+          <div className="grid grid-cols-3 gap-1 text-[8px]">
+            <div className="rounded border border-border bg-background/40 p-1"><span className="block text-muted-foreground">FORMATO</span><strong>{item.format}</strong></div>
+            <div className="rounded border border-border bg-background/40 p-1"><span className="block text-muted-foreground">DURAÇÃO</span><strong>{fmtTime(item.duration)}</strong></div>
+            <div className="rounded border border-border bg-background/40 p-1"><span className="block text-muted-foreground">TAMANHO</span><strong>{(item.size / (1024 * 1024)).toFixed(1)} MB</strong></div>
+          </div>
+          <div className="grid grid-cols-3 gap-1">
+            {actions.map(({ label, icon: Icon, color, border, onClick, title }) => (
+              <button key={label} className={`flex min-h-12 flex-col items-center justify-center gap-1 rounded-md border bg-background/50 px-1 py-1.5 transition-colors hover:bg-muted/70 ${border} ${color}`} onClick={onClick} title={title} disabled={!onClick}>
+                <Icon className="size-4" />
+                <span className="text-center text-[8px] font-bold leading-tight">{label}</span>
+              </button>
+            ))}
           </div>
         </>
       )}
