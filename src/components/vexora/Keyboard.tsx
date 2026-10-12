@@ -44,7 +44,7 @@ export function KeyboardPanel({ selected, onSelect, editMode }: Props) {
 
   const renderRows = (rows: Row[]) =>
     rows.map((row, i) => (
-      <div key={i} className={`flex min-w-0 gap-0.5 ${row.length === 1 && "code" in row[0] && row[0].code === "Space" ? "justify-center" : ""}`}>
+      <div key={i} className={`flex w-full min-w-0 gap-0.5 ${row.length === 1 && "code" in row[0] && row[0].code === "Space" ? "justify-center" : ""}`}>
         {row.map((k, j) => ("gap" in k ? <div key={j} style={{ width: `calc(var(--u) * ${k.gap})` }} className="flex-none" /> : <PadKey key={k.code} {...keyProps(k.code, k.w)} />))}
       </div>
     ));
