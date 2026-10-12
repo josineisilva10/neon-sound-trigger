@@ -41,6 +41,75 @@ export async function importAudioFiles(files: File[]): Promise<string[]> {
   return ids;
 }
 
+function audioBufferToWav(buffer: AudioBuffer): Blob {
+  const channels = buffer.numberOfChannels;
+  const frames = buffer.length;
+  const bytes = 2;
+  const out = new ArrayBuffer(44 + frames * channels * bytes);
+  const view = new DataView(out);
+  const write = (offset: number, value: string) => { for (let i = 0; i < value.length; i++) view.setUint8(offset + i, value.charCodeAt(i)); };
+  write(0, "RIFF"); view.setUint32(4, 36 + frames * channels * bytes, true); write(8, "WAVE");
+  write(12, "fmt "); view.setUint32(16, 16, true); view.setUint16(20, 1, true); view.setUint16(22, channels, true);
+  view.setUint32(24, buffer.sampleRate, true); view.setUint32(28, buffer.sampleRate * channels * bytes, true);
+  view.setUint16(32, channels * bytes, true); view.setUint16(34, 16, true); write(36, "data"); view.setUint32(40, frames * channels * bytes, true);
+  let offset = 44;
+  for (let i = 0; i < frames; i++) for (let ch = 0; ch < channels; ch++) {
+    const sample = Math.max(-1, Math.min(1, buffer.getChannelData(ch)[i]));
+    view.setInt16(offset, sample < 0 ? sample * 0x8000 : sample * 0x7fff, true); offset += 2;
+  }
+  return new Blob([out], { type: "audio/wav" });
+}
+
+async function saveProcessedAudio(bankId: string, code: string, buffer: AudioBuffer, suffix: string) {
+  const sourcePad = store.get().banks.find((b) => b.id === bankId)?.pads[code];
+  if (!sourcePad?.fileId) return;
+  const original = store.get().library.find((l) => l.id === sourcePad.fileId);
+  const blob = audioBufferToWav(buffer);
+  const file = new File([blob], `${original?.name ?? "audio"}-${suffix}.wav`, { type: "audio/wav" });
+  const [id] = await importAudioFiles([file]);
+  if (!id) return;
+  const state = store.get();
+  const latest = state.banks.find((b) => b.id === bankId)?.pads[code];
+  if (latest) {
+    const item = state.library.find((l) => l.id === id);
+    store.set((s) => ({ ...s, banks: s.banks.map((b) => b.id === bankId ? { ...b, pads: { ...b.pads, [code]: { ...latest, fileId: id, name: `${original?.name ?? latest.name} - ${suffix}` } } } : b) }));
+    if (item) toast.success(`Áudio processado: ${item.name}`);
+  }
+}
+
+export async function trimPadAudio(bankId: string, code: string, startSeconds: number, endSeconds: number) {
+  const pad = store.get().banks.find((b) => b.id === bankId)?.pads[code];
+  if (!pad?.fileId) return toast.error("Selecione um pad com áudio");
+  try {
+    const src = await engine.load(pad.fileId);
+    const start = Math.max(0, Math.min(src.duration, startSeconds));
+    const end = Math.max(start + 0.05, Math.min(src.duration, endSeconds));
+    if (end <= start || end - start < 0.05) return toast.error("Selecione um trecho maior que 0,05 segundo");
+    const frames = Math.floor((end - start) * src.sampleRate);
+    const out = new AudioBuffer({ numberOfChannels: src.numberOfChannels, length: frames, sampleRate: src.sampleRate });
+    for (let ch = 0; ch < src.numberOfChannels; ch++) out.copyToChannel(src.getChannelData(ch).slice(Math.floor(start * src.sampleRate), Math.floor(start * src.sampleRate) + frames), ch);
+    await saveProcessedAudio(bankId, code, out, "cortado");
+  } catch { toast.error("Não foi possível cortar este áudio"); }
+}
+
+export async function normalizePadAudio(bankId: string, code: string) {
+  const pad = store.get().banks.find((b) => b.id === bankId)?.pads[code];
+  if (!pad?.fileId) return toast.error("Selecione um pad com áudio");
+  try {
+    const src = await engine.load(pad.fileId);
+    let peak = 0;
+    for (let ch = 0; ch < src.numberOfChannels; ch++) for (const sample of src.getChannelData(ch)) peak = Math.max(peak, Math.abs(sample));
+    if (peak < 0.00001) return toast.error("O áudio está silencioso");
+    const out = new AudioBuffer({ numberOfChannels: src.numberOfChannels, length: src.length, sampleRate: src.sampleRate });
+    const gain = 0.98 / peak;
+    for (let ch = 0; ch < src.numberOfChannels; ch++) {
+      const input = src.getChannelData(ch); const output = out.getChannelData(ch);
+      for (let i = 0; i < input.length; i++) output[i] = input[i] * gain;
+    }
+    await saveProcessedAudio(bankId, code, out, "normalizado");
+  } catch { toast.error("Não foi possível normalizar este áudio"); }
+}
+
 export async function replaceLibraryFile(id: string, file: File) {
   try {
     const buffer = await decodeFile(file);
