@@ -34,18 +34,23 @@ jobs:
         shell: pwsh
         run: |
           python -m pip install --upgrade pip
-          python -m pip install pillow cairosvg
+          python -m pip install pillow
+          npm install --no-save @resvg/resvg-js
           New-Item -ItemType Directory -Force -Path "src-tauri/icons" | Out-Null
           @'
-          import cairosvg
+          const fs = require("node:fs");
+          const { Resvg } = require("@resvg/resvg-js");
+          const svg = fs.readFileSync("public/vexora-logo.svg", "utf8");
+          const png = new Resvg(svg, { fitTo: { mode: "width", value: 256 } }).render().asPng();
+          fs.writeFileSync("vexora-icon.png", png);
+          '@ | Set-Content -Encoding utf8 generate_icon.cjs
+          node generate_icon.cjs
+          @'
           from PIL import Image
-          from io import BytesIO
-
-          png = cairosvg.svg2png(url="public/vexora-logo.svg", output_width=256, output_height=256)
-          image = Image.open(BytesIO(png)).convert("RGBA")
+          image = Image.open("vexora-icon.png").convert("RGBA")
           image.save("src-tauri/icons/icon.ico", format="ICO", sizes=[(16,16),(24,24),(32,32),(48,48),(64,64),(128,128),(256,256)])
-          '@ | Set-Content -Encoding utf8 generate_icon.py
-          python generate_icon.py
+          '@ | Set-Content -Encoding utf8 make_ico.py
+          python make_ico.py
           if (-not (Test-Path "src-tauri/icons/icon.ico")) {
             Write-Error "O ícone do VEXORA não foi gerado."
             exit 1
