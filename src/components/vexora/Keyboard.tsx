@@ -140,6 +140,7 @@ function PadKey({ code, w, pad, lib, selected, reserved, playing, label, barRef,
       onClick={onClick}
       onDoubleClick={onDoubleClick}
       className="padkey px-1.5 py-1.5"
+      data-spacebar={code === "Space" || undefined}
       data-assigned={assigned || undefined}
       data-playing={playing || undefined}
       data-selected={selected || undefined}
