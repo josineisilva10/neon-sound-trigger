@@ -292,7 +292,7 @@ function App() {
                 <span className="text-neon-green">▰ ▰ ▰</span>
                 <span>CRIADO POR <strong className="text-white">NEYZINHO DAS PRODUÇÕES</strong></span>
                 <span className="text-neon-green">◆</span>
-                <span>WHATSAPP <strong className="text-white">(91) 99258-4049</strong></span>
+                <span>WHATSAPP <strong className="text-white">(91) 99358-4049</strong></span>
                 <span className="text-neon-green">▰ ▰ ▰</span>
               </div>)}
             </div>
