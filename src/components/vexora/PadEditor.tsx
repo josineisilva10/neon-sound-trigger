@@ -25,9 +25,9 @@ export function PadEditor({ code }: { code: string | null }) {
   const set = (patch: Partial<Pad>) => updatePad(bank.id, code, patch);
 
   return (
-    <div className="panel space-y-2 p-2 sm:p-3">
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="rounded-md border px-2 py-0.5 font-display text-base font-bold neon-text" style={{ color: p.color, borderColor: p.color }}>{keyLabel(code, s.settings.layout)}</span>
+    <div className="panel space-y-1 p-1 sm:p-1.5">
+      <div className="flex flex-wrap items-center gap-1">
+        <span className="rounded-md border px-1.5 py-0 font-display text-sm font-bold neon-text" style={{ color: p.color, borderColor: p.color }}>{keyLabel(code, s.settings.layout)}</span>
         <input className={inputCls + " min-w-40 flex-1 py-1 text-xs"} placeholder="Nome do pad" value={p.name} onChange={(e) => set({ name: e.target.value })} />
         <button className="btn" onClick={() => trigger(bank.id, code)} disabled={!p.fileId}><Play className="size-4" /> Tocar</button>
         <button className="btn" onClick={() => stopPad(bank.id, code)}><Square className="size-4" /> Parar</button>
@@ -42,20 +42,20 @@ export function PadEditor({ code }: { code: string | null }) {
         }} />
       </div>
 
-      <div className="grid gap-2 md:grid-cols-[1fr_auto]">
+      <div className="grid gap-1 md:grid-cols-[1fr_auto]">
         <Field label={item ? `${item.name} · ${item.format} · ${fmtTime(item.duration)}${item.missing ? " · ARQUIVO AUSENTE" : ""}` : "Arquivo"}>
           <select className={inputCls} value={p.fileId ?? ""} onChange={(e) => set({ fileId: e.target.value || null })}>
             <option value="">— nenhum —</option>
             {s.library.map((l) => <option key={l.id} value={l.id}>{l.name} ({l.format})</option>)}
           </select>
         </Field>
-        <div className="flex items-end gap-1">
-          {PAD_COLORS.map((c) => <button key={c} aria-label={`Cor ${c}`} onClick={() => set({ color: c, playColor: c })} className="size-6 rounded-full border-2" style={{ background: c, borderColor: p.color === c ? "var(--foreground)" : "transparent" }} />)}
+        <div className="flex items-end gap-0.5">
+          {PAD_COLORS.map((c) => <button key={c} aria-label={`Cor ${c}`} onClick={() => set({ color: c, playColor: c })} className="size-4 rounded-full border" style={{ background: c, borderColor: p.color === c ? "var(--foreground)" : "transparent" }} />)}
         </div>
       </div>
-      {item && <Waveform peaks={item.peaks} color={p.color} height={40} />}
+      {item && <Waveform peaks={item.peaks} color={p.color} height={18} />}
 
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
+      <div className="grid grid-cols-3 gap-1 sm:grid-cols-4 lg:grid-cols-6 2xl:grid-cols-12">
         <Field label="Modo"><select className={inputCls} value={p.mode} onChange={(e) => set({ mode: e.target.value as Pad["mode"] })}><option value="once">Tocar uma vez</option><option value="loop">Repetir (loop)</option></select></Field>
         <Field label="Ao repetir tecla"><select className={inputCls} value={p.retrigger} onChange={(e) => set({ retrigger: e.target.value as Pad["retrigger"] })}><option value="restart">Reiniciar</option><option value="stop">Parar</option><option value="overlap">Sobrepor</option><option value="ignore">Ignorar</option></select></Field>
         <Field label="Grupo exclusivo"><input className={inputCls} placeholder="ex: música" value={p.group} onChange={(e) => set({ group: e.target.value })} /></Field>
