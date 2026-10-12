@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Toaster } from "sonner";
-import { Keyboard, Maximize2, Minus, Pencil, Settings as Cog, ShieldCheck, ShieldOff, X } from "lucide-react";
+import { Maximize2, Pencil, Settings as Cog } from "lucide-react";
 import { engine } from "@/lib/vexora/engine";
 import { getFile, requestPersistence } from "@/lib/vexora/db";
 import { detectLayout } from "@/lib/vexora/layout";
@@ -93,33 +93,23 @@ function App() {
     <div className="relative min-h-screen" data-anim={st.animations ? "on" : "off"} style={{ ["--panel-alpha" as string]: `${wallStyle ? w.panelOpacity : 85}%` }}>
       {wallStyle && w.target === "full" && <div className="fixed inset-0 -z-10" style={wallStyle}><div className="absolute inset-0 bg-background" style={{ opacity: w.dim }} /></div>}
       <Toaster theme="dark" position="bottom-right" richColors />
-      <header className="relative overflow-hidden border-b border-border" style={w.target === "header" ? wallStyle : undefined}>
-        {wallStyle && w.target === "header" && <div className="absolute inset-0 bg-background" style={{ opacity: w.dim }} />}
-        <div className="relative flex flex-wrap items-center gap-2 px-2 py-1">
-          <h1 className="font-display text-base font-extrabold tracking-[0.2em] text-neon-green neon-text">VEXORA <span className="text-neon-cyan">SAMPLER</span></h1>
-          <div className="flex flex-wrap gap-1">
-            {s.banks.map((b) => <button key={b.id} onClick={() => switchBank(b.id)} className={`rounded border px-2 py-0.5 text-xs font-bold ${b.id === s.activeBank ? "border-neon-orange text-neon-orange neon-text" : "border-border text-muted-foreground"}`}>{b.name}</button>)}
-          </div>
-          <div className="ml-auto flex items-center gap-1">
-            <button className={`btn ${armed ? "text-neon-green" : "text-neon-red"}`} onClick={() => setArmed(!armed)} title="Armar/desarmar disparo pelo teclado">{armed ? <ShieldCheck className="size-4" /> : <ShieldOff className="size-4" />}{armed ? "ARMADO" : "DESARMADO"}</button>
-            <button className={`btn ${editMode ? "text-neon-orange" : ""}`} onClick={() => setEditMode(!editMode)} title="Modo edição: clicar seleciona sem tocar"><Pencil className="size-4" /> Edição</button>
-            <button className="btn" onClick={() => setSettings({ view: st.view === "keyboard" ? "grid" : "keyboard" })}><Keyboard className="size-4" /> {st.view === "keyboard" ? "Grade" : "Teclado"}</button>
-            <button className="btn" onClick={() => setShowSettings(true)} aria-label="Configurações"><Cog className="size-4" /></button>
-            {isDesktop() && <button className="btn" onClick={() => windowControl("min")} aria-label="Minimizar"><Minus className="size-4" /></button>}
-            <button className="btn" onClick={() => windowControl("max")} aria-label="Maximizar"><Maximize2 className="size-4" /></button>
-            {isDesktop() && <button className="btn hover:text-neon-red" onClick={() => windowControl("close")} aria-label="Fechar"><X className="size-4" /></button>}
-          </div>
-        </div>
-      </header>
-      <main className="grid min-w-0 grid-cols-1 items-start gap-2 p-2 lg:grid-cols-[190px_minmax(0,1fr)]">
+
+      <main className="grid min-w-0 grid-cols-1 items-start gap-1.5 p-1.5 lg:grid-cols-[190px_minmax(0,1fr)]">
         <aside className="flex min-w-0 flex-col gap-1.5">
+          <div className="panel flex min-h-[42px] items-center justify-center overflow-hidden px-1 py-0.5">
+            <h1 className="text-center font-display text-lg font-extrabold leading-none tracking-[0.16em] text-neon-green neon-text">VEXORA<br /><span className="text-neon-cyan">SAMPLER</span></h1>
+          </div>
           <SidePanel selected={selected} />
           {st.show.editor && <PadEditor code={selected} />}
         </aside>
-        <section className="flex min-w-0 flex-col gap-2">
-          <div className="relative min-h-[180px] overflow-hidden rounded-md border border-border sm:min-h-[230px] lg:min-h-[30vh]" style={wallStyle}>
-            {(!wallStyle || w.target === "header") && <div className="absolute inset-0 bg-background/20" />}
-            {wallStyle && w.target === "full" && <div className="absolute inset-0 bg-background" style={{ opacity: w.dim }} />}
+        <section className="flex min-w-0 flex-col gap-1.5">
+          <div className="relative min-h-[180px] overflow-hidden rounded-md border border-border sm:min-h-[230px] lg:min-h-[31vh]" style={wallStyle}>
+            {(!wall || !w.enabled) && <div className="absolute inset-0 bg-background" />}
+            {wall && w.enabled && <div className="absolute inset-0 bg-background" style={{ opacity: w.dim }} />}
+            <div className="absolute right-1 top-1 z-10 flex gap-1">
+              <button className="btn !p-1.5" onClick={() => setShowSettings(true)} aria-label="Configurações"><Cog className="size-4" /></button>
+              <button className="btn !p-1.5" onClick={() => windowControl("max")} aria-label="Maximizar"><Maximize2 className="size-4" /></button>
+            </div>
           </div>
           <KeyboardPanel selected={selected} onSelect={setSelected} editMode={editMode} />
         </section>
