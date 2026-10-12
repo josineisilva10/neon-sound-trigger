@@ -25,11 +25,25 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Generate VEXORA Windows icon
+      - name: Generate VEXORA Windows icon from the actual logo
         shell: pwsh
         run: |
-          New-Item -ItemType Directory -Force -Path "src-tauri/icons" | Out-Null
-          Copy-Item "public/favicon.ico" "src-tauri/icons/icon.ico" -Force
+          $toolDir = Join-Path $env:RUNNER_TEMP "vexora-icon-tool"
+          New-Item -ItemType Directory -Force -Path $toolDir, "src-tauri/icons" | Out-Null
+          npm install --prefix $toolDir --no-audit --no-fund @resvg/resvg-js png-to-ico
+          $script = @'
+          const fs = require("node:fs");
+          const path = require("node:path");
+          const { Resvg } = require(path.join(process.env.RUNNER_TEMP, "vexora-icon-tool", "node_modules", "@resvg", "resvg-js"));
+          const pngToIco = require(path.join(process.env.RUNNER_TEMP, "vexora-icon-tool", "node_modules", "png-to-ico"));
+          const svg = fs.readFileSync("public/vexora-logo.svg", "utf8");
+          const png = new Resvg(svg, { fitTo: { mode: "width", value: 256 } }).render().asPng();
+          pngToIco(png).then((ico) => fs.writeFileSync("src-tauri/icons/icon.ico", ico)).catch((error) => { console.error(error); process.exit(1); });
+          '@
+          $scriptPath = Join-Path $env:RUNNER_TEMP "make-vexora-icon.cjs"
+          Set-Content -Path $scriptPath -Value $script -Encoding utf8
+          node $scriptPath
+          if (-not (Test-Path "src-tauri/icons/icon.ico")) { throw "O ícone VEXORA não foi gerado." }
 
       - name: Install frontend dependencies
         run: bun install --frozen-lockfile
