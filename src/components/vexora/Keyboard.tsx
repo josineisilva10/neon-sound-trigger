@@ -81,12 +81,12 @@ export function KeyboardPanel({ selected, onSelect, editMode }: Props) {
 
   return (
     <div className="panel keyboard-fit-panel p-1" style={{ ["--u" as string]: unit }}>
-      <div className="flex w-full min-w-0 items-start gap-0">
-        <div className="flex min-w-0 flex-1 flex-col gap-0">
+      <div className="flex w-full min-w-0 items-start gap-1 overflow-x-auto">
+        <div className="flex w-max min-w-0 flex-none flex-col gap-0">
           {st.show.fn && <div className="mb-1">{renderRows([FUNCTION_ROW])}</div>}
           {renderRows(compactRows)}
         </div>
-        {st.show.nav && <div className="ml-0 flex w-[calc(var(--u)*4.2)] flex-none flex-col gap-0 overflow-hidden" style={{ ["--u" as string]: navUnit }}>{st.show.fn && <div className="mb-1 h-[var(--u)]" />}{renderRows(NAV_ROWS)}</div>}
+        {st.show.nav && <div className="flex w-max flex-none flex-col gap-0" style={{ ["--u" as string]: navUnit }}>{st.show.fn && <div className="mb-1 h-[var(--u)]" />}{renderRows(NAV_ROWS)}</div>}
       </div>
     </div>
   );
