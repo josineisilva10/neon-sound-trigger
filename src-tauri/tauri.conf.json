@@ -1,0 +1,44 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "VEXORA SAMPLER",
+  "version": "0.1.0",
+  "identifier": "com.neysinho.vexorasampler",
+  "build": {
+    "beforeDevCommand": "bun run dev -- --host 127.0.0.1",
+    "devUrl": "http://127.0.0.1:5173",
+    "beforeBuildCommand": "bun run build",
+    "frontendDist": "../.output/public"
+  },
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [
+      {
+        "title": "VEXORA SAMPLER",
+        "width": 1440,
+        "height": 900,
+        "minWidth": 1024,
+        "minHeight": 700,
+        "resizable": true,
+        "fullscreen": false
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": [
+      "nsis",
+      "msi"
+    ],
+    "category": "Music",
+    "shortDescription": "Sampler profissional para disparo de áudio",
+    "longDescription": "VEXORA SAMPLER — painel de disparo de áudio para DJs e produção.",
+    "windows": {
+      "webviewInstallMode": {
+        "type": "downloadBootstrapper"
+      }
+    }
+  }
+}
