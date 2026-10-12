@@ -142,10 +142,21 @@ function LedVisualizer({ onBack }: { onBack: () => void }) {
 
   useEffect(() => {
     let raf = 0;
-    const draw = () => {
-      const active = engine.voices.size > 0 && !engine.paused;
-      const spectrum = active ? engine.spectrum(48) : Array.from({ length: 48 }, () => 0.025);
-      setLevels((previous) => spectrum.map((v, i) => Math.max(v, (previous[i] ?? 0) * 0.82, active ? 0.04 : 0.025)));
+    let lastFrame = 0;
+    const draw = (time: number) => {
+      // Update the 48-band display at a steady ~30 FPS to keep the interface responsive.
+      if (time - lastFrame >= 33) {
+        lastFrame = time;
+        const active = engine.voices.size > 0 && !engine.paused;
+        const spectrum = active ? engine.spectrum(48) : Array.from({ length: 48 }, () => 0.025);
+        setLevels((previous) => spectrum.map((v, i) => {
+          const target = Math.max(active ? 0.025 : 0.015, v);
+          const current = previous[i] ?? 0.025;
+          // Fast attack, smooth release: the LEDs rise quickly and fall naturally.
+          const response = target > current ? 0.58 : 0.16;
+          return current + (target - current) * response;
+        }));
+      }
       raf = requestAnimationFrame(draw);
     };
     raf = requestAnimationFrame(draw);
