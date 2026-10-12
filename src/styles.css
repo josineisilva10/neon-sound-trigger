@@ -160,10 +160,15 @@
   }
   .keyboard-fit-panel .padkey {
     min-width: 0;
-    padding-inline: clamp(2px, 0.25cqi, 6px);
+    padding: clamp(3px, 0.45cqi, 7px);
+    border-radius: 0.55rem;
   }
   .keyboard-fit-panel .padkey > div > span {
-    font-size: clamp(7px, 1.35cqi, 11px);
+    font-size: clamp(10px, 1.8cqi, 15px);
+    letter-spacing: 0.01em;
+  }
+  .keyboard-fit-panel .padkey > div {
+    gap: 0.2rem;
   }
   .btn { display:inline-flex; align-items:center; justify-content:center; gap:.35rem; border:1px solid var(--border); background: color-mix(in oklab, var(--secondary) 80%, transparent); border-radius:.4rem; padding:.35rem .6rem; font-size:.8rem; font-weight:600; transition: border-color .1s, box-shadow .1s; }
   .btn:hover { border-color: var(--neon-cyan); box-shadow: 0 0 8px color-mix(in oklab, var(--neon-cyan) 50%, transparent); }
