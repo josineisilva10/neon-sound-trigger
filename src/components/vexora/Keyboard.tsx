@@ -51,7 +51,7 @@ export function KeyboardPanel({ selected, onSelect, editMode }: Props) {
 
   // Keep the keyboard large while scaling its keys to fit the available width.
   // The parent layout provides the container query width (cqi).
-  const unit = `clamp(2.45rem, calc((100cqi - 0.5rem) / 20), ${4.8 * st.padScale}rem)`;
+  const unit = `clamp(2.8rem, calc((100cqi - 0.25rem) / 18), ${5.2 * st.padScale}rem)`;
 
   if (st.view === "grid") {
     const codes = layoutCodes(st.layout).filter((c) => bank.pads[c]);
@@ -143,13 +143,13 @@ function PadKey({ code, w, pad, lib, selected, reserved, playing, label, barRef,
       style={{ ["--w" as string]: w, ["--led" as string]: playing ? p.playColor : p.color, ["--b" as string]: p.brightness, ["--s" as string]: `${p.speed}s` }}
     >
       <div className="flex items-center justify-between gap-1">
-        <span className="font-display text-xs font-bold leading-none sm:text-sm" style={{ color: assigned ? p.color : undefined }}>{label}</span>
+        <span className="font-display text-sm font-extrabold leading-none sm:text-base" style={{ color: assigned ? p.color : undefined }}>{label}</span>
         {playing && <span className="led-dot led-anim animate-pulse" />}
       </div>
       {assigned && (
         <>
-          <div className="mt-0.5 truncate text-xs font-semibold leading-tight sm:text-sm">{pad?.name || item?.name || "—"}</div>
-          <div className="font-mono text-[9px] text-muted-foreground">{item?.missing ? "AUSENTE" : fmtTime(item?.duration ?? 0)}{p.mode === "loop" ? " ⟳" : ""}</div>
+          <div className="mt-0.5 truncate text-sm font-bold leading-tight sm:text-base">{pad?.name || item?.name || "—"}</div>
+          <div className="font-mono text-[10px] text-muted-foreground">{item?.missing ? "AUSENTE" : fmtTime(item?.duration ?? 0)}{p.mode === "loop" ? " ⟳" : ""}</div>
         </>
       )}
       <div ref={barRef} className="absolute bottom-0 left-0 h-[3px]" style={{ background: p.playColor, width: 0 }} />
