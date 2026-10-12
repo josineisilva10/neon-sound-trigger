@@ -29,7 +29,7 @@
   "bundle": {
     "active": true,
     "targets": ["nsis", "msi"],
-    "icon": ["../public/favicon.ico"],
+    "icon": ["icons/icon.ico"],
     "category": "Music",
     "shortDescription": "Sampler profissional para disparo de áudio",
     "longDescription": "VEXORA SAMPLER — painel de disparo de áudio para DJs e produção.",
