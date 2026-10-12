@@ -176,3 +176,19 @@
   .btn-danger { display:flex; align-items:center; justify-content:center; gap:.4rem; border:2px solid var(--neon-red); color: var(--neon-red); border-radius:.4rem; padding:.5rem; font-family: var(--font-display); font-weight:800; letter-spacing:.1em; box-shadow: 0 0 12px color-mix(in oklab, var(--neon-red) 50%, transparent); }
   .btn-danger:hover { background: var(--neon-red); color: var(--background); }
 }
+
+
+@keyframes vexora-led-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.vexora-led-track {
+  display: flex;
+  width: max-content;
+  min-width: 200%;
+  animation: vexora-led-scroll 24s linear infinite;
+}
+.vexora-led-track:hover { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) {
+  .vexora-led-track { animation: none; transform: none; min-width: 100%; }
+}
