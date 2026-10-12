@@ -95,14 +95,31 @@ function AudioInfoPanel({ code }: { code: string | null }) {
                 <strong className="text-[10px] text-neon-cyan">CORTAR ÁUDIO</strong>
                 <button className="btn !px-2 !py-1 text-[9px]" onClick={() => setShowTrim(false)}>Fechar</button>
               </div>
-              <div className="text-[9px] text-muted-foreground">Escolha o trecho que deseja manter. O original será preservado como outro áudio.</div>
-              <label className="block text-[9px]">Início: {trimStart.toFixed(2)} s
-                <input className="w-full" type="range" min={0} max={Math.max(0.05, item.duration - 0.05)} step={0.05} value={Math.min(trimStart, Math.max(0, item.duration - 0.05))} onChange={(e) => setTrimStart(Math.min(+e.target.value, trimEnd - 0.05))} />
+              <div className="flex items-center justify-between gap-2 text-[8px] text-muted-foreground">
+                <span>{pad?.name || item.name}</span><span>{fmtTime(item.duration)} · {item.format}</span>
+              </div>
+              <div className="relative overflow-hidden rounded-md border border-border bg-[#080d1b] p-2">
+                <div className="mb-1 flex justify-between font-mono text-[8px] text-slate-400"><span>00:00</span><span>{fmtTime(item.duration / 2)}</span><span>{fmtTime(item.duration)}</span></div>
+                <div className="relative flex h-20 items-center gap-[1px] overflow-hidden rounded border border-slate-700/70">
+                  {item.peaks.map((peak, i) => {
+                    const t = (i / Math.max(1, item.peaks.length - 1)) * item.duration;
+                    const selectedPeak = t >= trimStart && t <= trimEnd;
+                    return <div key={i} className="flex-1 rounded-sm" style={{height: `${Math.max(4, peak * 90)}%`,background: selectedPeak ? "#22d3ee" : "#64748b",opacity:selectedPeak ? 0.95 : 0.4}} />;
+                  })}
+                  <div className="pointer-events-none absolute inset-y-0 border-x-2 border-cyan-300 bg-cyan-400/15" style={{left:`${(trimStart / Math.max(item.duration,0.01))*100}%`,width:`${Math.max(0,(trimEnd-trimStart)/Math.max(item.duration,0.01)*100)}%`}} />
+                </div>
+                <div className="mt-1 flex justify-between text-[8px] text-cyan-300"><span>Início: {trimStart.toFixed(2)} s</span><span>Fim: {trimEnd.toFixed(2)} s</span></div>
+              </div>
+              <label className="block text-[9px]">Ponto inicial
+                <input aria-label="Ponto inicial do corte" className="w-full accent-cyan-400" type="range" min={0} max={Math.max(0, item.duration - 0.05)} step={0.01} value={Math.min(trimStart, Math.max(0, item.duration - 0.05))} onChange={(e) => setTrimStart(Math.min(+e.target.value, trimEnd - 0.05))} />
               </label>
-              <label className="block text-[9px]">Fim: {trimEnd.toFixed(2)} s
-                <input className="w-full" type="range" min={Math.min(item.duration, trimStart + 0.05)} max={item.duration} step={0.05} value={Math.max(trimEnd, trimStart + 0.05)} onChange={(e) => setTrimEnd(+e.target.value)} />
+              <label className="block text-[9px]">Ponto final
+                <input aria-label="Ponto final do corte" className="w-full accent-cyan-400" type="range" min={Math.min(item.duration, trimStart + 0.05)} max={item.duration} step={0.01} value={Math.max(trimEnd, trimStart + 0.05)} onChange={(e) => setTrimEnd(+e.target.value)} />
               </label>
-              <button className="btn w-full !py-1.5 text-[10px]" onClick={() => { if (code && trimEnd > trimStart) { void trimPadAudio(bank.id, code, trimStart, trimEnd); setShowTrim(false); } }}>Aplicar corte e criar áudio</button>
+              <div className="grid grid-cols-2 gap-1">
+                <button className="btn !py-1.5 text-[9px]" onClick={() => { if (code && trimEnd > trimStart) { void trimPadAudio(bank.id, code, trimStart, trimEnd); setShowTrim(false); } }}>✓ MANTER SELEÇÃO</button>
+                <button className="btn !py-1.5 text-[9px]" onClick={() => { setTrimStart(0); setTrimEnd(item.duration); }}>↺ REINICIAR SELEÇÃO</button>
+              </div>
             </div>
           )}
           <div className="grid grid-cols-3 gap-1">
