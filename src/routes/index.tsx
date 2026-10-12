@@ -111,7 +111,7 @@ function App() {
             </div>
           </div>
           <KeyboardPanel selected={selected} onSelect={setSelected} editMode={editMode} />
-          {st.show.editor && <PadEditor code={selected} />
+          {st.show.editor && <PadEditor code={selected} />}
         </section>
       </main>
       {showSettings && <SettingsDialog onClose={() => setShowSettings(false)} />}
