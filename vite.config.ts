@@ -9,7 +9,14 @@ import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 export default defineConfig({
   tanstackStart: {
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
-    // nitro/vite builds from this
+    // nitro/vite builds from this.
     server: { entry: "server" },
+    // Produce a static entry page for the Tauri WebView while keeping the normal web build.
+    prerender: {
+      enabled: true,
+      routes: ["/"],
+      crawlLinks: false,
+      failOnError: true,
+    },
   },
 });
