@@ -104,9 +104,10 @@ function PadKey({ code, w, pad, lib, selected, reserved, playing, label, barRef,
       type="button"
       draggable={!!pad}
       onDragStart={(e) => e.dataTransfer.setData("vexora/key", code)}
-      onDragOver={(e) => e.preventDefault()}
+      onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); e.dataTransfer.dropEffect = e.dataTransfer.types.includes("Files") ? "copy" : "move"; }} onDragEnter={(e) => { e.preventDefault(); e.stopPropagation(); }}
       onDrop={(e) => {
         e.preventDefault();
+        e.stopPropagation();
         const k = e.dataTransfer.getData("vexora/key");
         const fileId = e.dataTransfer.getData("vexora/file");
         const droppedFiles = Array.from(e.dataTransfer.files ?? []);
