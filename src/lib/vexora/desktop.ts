@@ -1,10 +1,12 @@
 // Native desktop bridge (Tauri v2, withGlobalTauri: true). In the browser every function reports "unavailable".
 type TauriGlobal = {
+  core?: {
+    invoke: <T>(command: string, args?: Record<string, unknown>) => Promise<T>;
+  };
   globalShortcut?: {
     register: (s: string | string[], h: (e: { shortcut: string; state: "Pressed" | "Released" }) => void) => Promise<void>;
     unregisterAll: () => Promise<void>;
   };
-  window?: { getCurrentWindow: () => { minimize(): Promise<void>; toggleMaximize(): Promise<void>; close(): Promise<void> } };
 };
 const tauri = (): TauriGlobal | undefined =>
   typeof window === "undefined" ? undefined : (window as unknown as { __TAURI__?: TauriGlobal }).__TAURI__;
@@ -39,8 +41,12 @@ export async function unregisterGlobalShortcuts() {
 }
 
 export function windowControl(action: "min" | "max" | "close") {
-  const w = tauri()?.window?.getCurrentWindow();
-  if (w) return action === "min" ? w.minimize() : action === "max" ? w.toggleMaximize() : w.close();
+  const api = tauri();
+  if (action === "max" && api?.core?.invoke) {
+    return api.core.invoke("toggle_maximize").catch((error) => {
+      console.error("Não foi possível maximizar a janela do VEXORA SAMPLER:", error);
+    });
+  }
   if (action === "max") {
     if (document.fullscreenElement) void document.exitFullscreen();
     else void document.documentElement.requestFullscreen();
