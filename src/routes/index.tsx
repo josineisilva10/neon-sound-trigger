@@ -111,10 +111,18 @@ function App() {
           </div>
         </div>
       </header>
-      <main className="flex min-w-0 flex-col gap-2 p-2">
-        <SidePanel selected={selected} />
-        {st.show.editor && <PadEditor code={selected} />}
-        <KeyboardPanel selected={selected} onSelect={setSelected} editMode={editMode} />
+      <main className="grid min-w-0 grid-cols-1 items-start gap-2 p-2 lg:grid-cols-[190px_minmax(0,1fr)]">
+        <aside className="flex min-w-0 flex-col gap-1.5">
+          <SidePanel selected={selected} />
+          {st.show.editor && <PadEditor code={selected} />}
+        </aside>
+        <section className="flex min-w-0 flex-col gap-2">
+          <div className="relative min-h-[180px] overflow-hidden rounded-md border border-border sm:min-h-[230px] lg:min-h-[32vh]" style={wallStyle}>
+            {(!wallStyle || w.target === "header") && <div className="absolute inset-0 bg-background/20" />}
+            {wallStyle && w.target === "full" && <div className="absolute inset-0 bg-background" style={{ opacity: w.dim }} />}
+          </div>
+          <KeyboardPanel selected={selected} onSelect={setSelected} editMode={editMode} />
+        </section>
       </main>
       {showSettings && <SettingsDialog onClose={() => setShowSettings(false)} />}
     </div>
