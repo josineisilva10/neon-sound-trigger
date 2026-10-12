@@ -15,7 +15,7 @@ export function StereoMeter() {
       lv.forEach((v, ch) => {
         held[ch] = Math.max(v, held[ch] * 0.9);
         const n = Math.round(Math.min(1, held[ch]) * SEGS);
-        refs.current[ch].forEach((el, i) => el && (i >= SEGS - n ? el.setAttribute("data-on", "") : el.removeAttribute("data-on")));
+        refs.current[ch].forEach((el, i) => el && (i < n ? el.setAttribute("data-on", "") : el.removeAttribute("data-on")));
       });
       raf = requestAnimationFrame(loop);
     };
@@ -26,9 +26,9 @@ export function StereoMeter() {
     <div className="flex gap-2">
       {["L", "R"].map((lab, ch) => (
         <div key={lab} className="flex flex-col items-center gap-1">
-          <div className="flex flex-col gap-[2px]">
+          <div className="flex flex-col-reverse gap-[2px]">
             {Array.from({ length: SEGS }, (_, i) => (
-              <div key={i} ref={(el) => { refs.current[ch][i] = el; }} className="meter-seg h-[5px] w-4 rounded-[1px]" style={{ ["--seg" as string]: segColor(SEGS - 1 - i) }} />
+              <div key={i} ref={(el) => { refs.current[ch][i] = el; }} className="meter-seg h-[5px] w-4 rounded-[1px]" style={{ ["--seg" as string]: segColor(i) }} />
             ))}
           </div>
           <span className="font-mono text-[10px] text-muted-foreground">{lab}</span>
