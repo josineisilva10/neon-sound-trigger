@@ -20,7 +20,8 @@
         "minHeight": 700,
         "resizable": true,
         "fullscreen": false,
-        "dragDropEnabled": false
+        "dragDropEnabled": false,
+        "decorations": false
       }
     ],
     "security": {
@@ -29,8 +30,13 @@
   },
   "bundle": {
     "active": true,
-    "targets": ["nsis", "msi"],
-    "icon": ["icons/icon.ico"],
+    "targets": [
+      "nsis",
+      "msi"
+    ],
+    "icon": [
+      "icons/icon.ico"
+    ],
     "category": "Music",
     "shortDescription": "Sampler profissional para disparo de áudio",
     "longDescription": "VEXORA SAMPLER — painel de disparo de áudio para DJs e produção.",
