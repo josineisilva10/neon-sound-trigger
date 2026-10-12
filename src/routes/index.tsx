@@ -256,8 +256,10 @@ function App() {
 
   const w = st.wallpaper;
   const wallStyle = wall && w.enabled ? { backgroundImage: `url(${wall})`, backgroundSize: FIT[w.fit], backgroundPosition: `${w.x}% ${w.y}%`, backgroundRepeat: "no-repeat" } : undefined;
-  // The dedicated banner uses the full 3:1 image so its footer/contact details stay visible.
-  const bannerWallStyle = wall && w.enabled ? { ...wallStyle, backgroundSize: "100% 100%", backgroundPosition: "center", backgroundRepeat: "no-repeat" } : undefined;
+  // Show the bundled VEXORA wallpaper for every fresh install until the user enables a custom one.
+  const bannerWallStyle = wall && w.enabled
+    ? { ...wallStyle, backgroundSize: "100% 100%", backgroundPosition: "center", backgroundRepeat: "no-repeat" }
+    : { backgroundImage: 'url("/vexora-wallpaper.svg")', backgroundSize: "100% 100%", backgroundPosition: "center", backgroundRepeat: "no-repeat" };
 
   return (
     <div className="relative min-h-screen" data-anim={st.animations ? "on" : "off"} style={{ ["--panel-alpha" as string]: `${wallStyle ? w.panelOpacity : 85}%` }}>
