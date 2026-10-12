@@ -1,24 +1,127 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { Toaster } from "sonner";
+import { Keyboard, Library as LibIcon, Maximize2, Minus, Pencil, Settings as Cog, ShieldCheck, ShieldOff, X } from "lucide-react";
+import { engine } from "@/lib/vexora/engine";
+import { getFile, requestPersistence } from "@/lib/vexora/db";
+import { detectLayout } from "@/lib/vexora/layout";
+import { activeBank, setSettings, store, useAppState } from "@/lib/vexora/store";
+import { checkLibrary, preloadBank, switchBank, trigger } from "@/lib/vexora/actions";
+import { isDesktop, registerGlobalShortcuts, unregisterGlobalShortcuts, windowControl } from "@/lib/vexora/desktop";
+import { KeyboardPanel } from "@/components/vexora/Keyboard";
+import { PadEditor } from "@/components/vexora/PadEditor";
+import { SidePanel } from "@/components/vexora/SidePanel";
+import { Library } from "@/components/vexora/Library";
+import { SettingsDialog } from "@/components/vexora/Settings";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
 export const Route = createFileRoute("/")({
-  component: Index,
+  head: () => ({
+    meta: [
+      { title: "VEXORA SAMPLER — Disparo de áudio pelo teclado" },
+      { name: "description", content: "Sampler profissional: associe sons a qualquer tecla, LEDs neon, bancos, biblioteca e papel de parede personalizado." },
+      { property: "og:title", content: "VEXORA SAMPLER" },
+      { property: "og:description", content: "Transforme o teclado do computador em um painel de disparo de sons." },
+    ],
+  }),
+  component: App,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
-function Index() {
+const FIT = { fill: "cover", fit: "contain", center: "auto", zoom: "160%" } as const;
+
+function App() {
+  const s = useAppState();
+  const st = s.settings;
+  const [selected, setSelected] = useState<string | null>(null);
+  const [editMode, setEditMode] = useState(false);
+  const [armed, setArmed] = useState(true);
+  const [showSettings, setShowSettings] = useState(false);
+  const [wall, setWall] = useState<string | null>(null);
+
+  useEffect(() => {
+    store.hydrate(detectLayout());
+    engine.latency = store.get().settings.latency;
+    void requestPersistence();
+    void checkLibrary().then(preloadBank);
+  }, []);
+
+  useEffect(() => { engine.setMaster(st.master, st.muted); engine.maxVoices = st.maxVoices; }, [st.master, st.muted, st.maxVoices]);
+
+  useEffect(() => {
+    let url: string | null = null;
+    const load = async () => {
+      const f = await getFile("wallpaper").catch(() => undefined);
+      if (url) URL.revokeObjectURL(url);
+      url = f ? URL.createObjectURL(f.blob) : null;
+      setWall(url);
+    };
+    void load();
+    window.addEventListener("vexora:wallpaper", load);
+    return () => window.removeEventListener("vexora:wallpaper", load);
+  }, []);
+
+  // Foreground keyboard capture
+  useEffect(() => {
+    const h = (e: KeyboardEvent) => {
+      const t = e.target as HTMLElement;
+      if (showSettings || t.closest("input,textarea,select,[contenteditable]")) return;
+      const cur = store.get();
+      const cs = cur.settings;
+      if (e.repeat) { if (activeBank(cur).pads[e.code]) e.preventDefault(); return; }
+      if (e.code === cs.stopAllKey && cs.stopAllKey) { e.preventDefault(); return engine.stopAll(); }
+      if (!armed || (cs.globalShortcuts && isDesktop())) return;
+      if (e.code === cs.nextBankKey) { e.preventDefault(); return switchBank(1); }
+      if (e.code === cs.prevBankKey) { e.preventDefault(); return switchBank(-1); }
+      if (cs.reserved.includes(e.code) || e.ctrlKey || e.metaKey) return;
+      if (activeBank(cur).pads[e.code]?.fileId) { e.preventDefault(); trigger(cur.activeBank, e.code); }
+    };
+    window.addEventListener("keydown", h);
+    return () => window.removeEventListener("keydown", h);
+  }, [armed, showSettings]);
+
+  // Global shortcuts (desktop only)
+  const bank = activeBank(s);
+  useEffect(() => {
+    if (!isDesktop()) return;
+    if (!st.globalShortcuts || !armed) { void unregisterGlobalShortcuts(); return; }
+    const codes = Object.keys(bank.pads).filter((c) => bank.pads[c].fileId && !st.reserved.includes(c));
+    void registerGlobalShortcuts(codes, (c) => trigger(store.get().activeBank, c));
+  }, [st.globalShortcuts, armed, bank, st.reserved]);
+
+  const w = st.wallpaper;
+  const wallStyle = wall && w.enabled ? { backgroundImage: `url(${wall})`, backgroundSize: FIT[w.fit], backgroundPosition: `${w.x}% ${w.y}%`, backgroundRepeat: "no-repeat" } : undefined;
+
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
+    <div className="relative min-h-screen" data-anim={st.animations ? "on" : "off"} style={{ ["--panel-alpha" as string]: `${wallStyle ? w.panelOpacity : 85}%` }}>
+      {wallStyle && w.target === "full" && <div className="fixed inset-0 -z-10" style={wallStyle}><div className="absolute inset-0 bg-background" style={{ opacity: w.dim }} /></div>}
+      <Toaster theme="dark" position="bottom-right" richColors />
+      <header className="relative overflow-hidden border-b border-border" style={w.target === "header" ? wallStyle : undefined}>
+        {wallStyle && w.target === "header" && <div className="absolute inset-0 bg-background" style={{ opacity: w.dim }} />}
+        <div className="relative flex flex-wrap items-center gap-3 px-4 py-2">
+          <h1 className="font-display text-xl font-extrabold tracking-[0.25em] text-neon-green neon-text">VEXORA <span className="text-neon-cyan">SAMPLER</span></h1>
+          <div className="flex flex-wrap gap-1">
+            {s.banks.map((b) => <button key={b.id} onClick={() => switchBank(b.id)} className={`rounded border px-2 py-0.5 text-xs font-bold ${b.id === s.activeBank ? "border-neon-orange text-neon-orange neon-text" : "border-border text-muted-foreground"}`}>{b.name}</button>)}
+          </div>
+          <div className="ml-auto flex items-center gap-1">
+            <button className={`btn ${armed ? "text-neon-green" : "text-neon-red"}`} onClick={() => setArmed(!armed)} title="Armar/desarmar disparo pelo teclado">{armed ? <ShieldCheck className="size-4" /> : <ShieldOff className="size-4" />}{armed ? "ARMADO" : "DESARMADO"}</button>
+            <button className={`btn ${editMode ? "text-neon-orange" : ""}`} onClick={() => setEditMode(!editMode)} title="Modo edição: clicar seleciona sem tocar"><Pencil className="size-4" /> Edição</button>
+            <button className="btn" onClick={() => setSettings({ view: st.view === "keyboard" ? "grid" : "keyboard" })}><Keyboard className="size-4" /> {st.view === "keyboard" ? "Grade" : "Teclado"}</button>
+            <button className="btn" onClick={() => setSettings({ show: { ...st.show, library: !st.show.library } })}><LibIcon className="size-4" /></button>
+            <button className="btn" onClick={() => setShowSettings(true)} aria-label="Configurações"><Cog className="size-4" /></button>
+            {isDesktop() && <button className="btn" onClick={() => windowControl("min")} aria-label="Minimizar"><Minus className="size-4" /></button>}
+            <button className="btn" onClick={() => windowControl("max")} aria-label="Maximizar"><Maximize2 className="size-4" /></button>
+            {isDesktop() && <button className="btn hover:text-neon-red" onClick={() => windowControl("close")} aria-label="Fechar"><X className="size-4" /></button>}
+          </div>
+        </div>
+      </header>
+      <main className={`grid gap-3 p-3 lg:grid-cols-[260px_minmax(0,1fr)${st.show.library ? "_300px" : ""}]`} style={{ gridTemplateColumns: undefined }}>
+        <SidePanel selected={selected} />
+        <div className="flex min-w-0 flex-col gap-3">
+          <KeyboardPanel selected={selected} onSelect={setSelected} editMode={editMode} />
+          {st.show.editor && <PadEditor code={selected} />}
+        </div>
+        {st.show.library && <div className="lg:max-h-[calc(100vh-5rem)]"><Library selected={selected} /></div>}
+      </main>
+      {showSettings && <SettingsDialog onClose={() => setShowSettings(false)} />}
     </div>
   );
 }
