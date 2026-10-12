@@ -283,7 +283,7 @@ function App() {
             </div>
           </div>
           {ledActive && audioPlaying ? <LedVisualizer onBack={() => setLedActive(false)} /> : <KeyboardPanel selected={selected} onSelect={setSelected} editMode={editMode} />}
-          {st.show.editor && <PadEditor code={selected} />}
+{/* Painel de edição ocultado temporariamente para testar o espaço disponível. */}
           <div className="panel relative h-6 overflow-hidden border-cyan-400/60 bg-[#020713] px-0 py-0 shadow-[0_0_10px_rgba(0,217,255,0.15)]" aria-label="Créditos do VEXORA SAMPLER">
             <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-8 bg-gradient-to-r from-[#020713] to-transparent" />
             <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-8 bg-gradient-to-l from-[#020713] to-transparent" />
