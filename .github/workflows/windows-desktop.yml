@@ -35,7 +35,8 @@ jobs:
           const fs = require("node:fs");
           const path = require("node:path");
           const { Resvg } = require(path.join(process.env.RUNNER_TEMP, "vexora-icon-tool", "node_modules", "@resvg", "resvg-js"));
-          const pngToIco = require(path.join(process.env.RUNNER_TEMP, "vexora-icon-tool", "node_modules", "png-to-ico"));
+          const pngToIcoModule = require(path.join(process.env.RUNNER_TEMP, "vexora-icon-tool", "node_modules", "png-to-ico"));
+          const pngToIco = pngToIcoModule.default || pngToIcoModule;
           const svg = fs.readFileSync("public/vexora-logo.svg", "utf8");
           const png = new Resvg(svg, { fitTo: { mode: "width", value: 256 } }).render().asPng();
           pngToIco(png).then((ico) => fs.writeFileSync("src-tauri/icons/icon.ico", ico)).catch((error) => { console.error(error); process.exit(1); });
