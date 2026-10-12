@@ -1,7 +1,7 @@
 import { useEffect, useRef, useSyncExternalStore } from "react";
 import { engine, fmtTime } from "@/lib/vexora/engine";
 import { FUNCTION_ROW, NAV_ROWS, keyLabel, layoutCodes, mainRows, numpadRows, type Row } from "@/lib/vexora/layout";
-import { activeBank, defaultPad, swapPads, updatePad, useAppState, type LibItem, type Pad } from "@/lib/vexora/store";
+import { activeBank, defaultPad, swapPads, updatePad, useAppState, store, type LibItem, type Pad } from "@/lib/vexora/store";
 import { importAudioFiles, trigger } from "@/lib/vexora/actions";
 
 interface Props {
@@ -121,7 +121,10 @@ function PadKey({ code, w, pad, lib, selected, reserved, playing, label, barRef,
             const id = ids[0];
             if (!id) return;
             const name = droppedFiles[0].name.replace(/\.[^.]+$/, "");
-            updatePad(bank.id, code, { fileId: id, name: bank.pads[code]?.name || name });
+            const currentState = store.get();
+            const currentBank = currentState.banks.find((b) => b.id === currentState.activeBank);
+            if (!currentBank) return;
+            updatePad(currentBank.id, code, { fileId: id, name });
             onSelect(code);
           });
         }
