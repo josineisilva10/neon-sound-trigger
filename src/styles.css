@@ -179,20 +179,18 @@
 
 
 @keyframes vexora-led-scroll {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(-50%, 0, 0); }
 }
 .vexora-led-track {
   display: flex;
   width: max-content;
+  flex-wrap: nowrap;
   will-change: transform;
-  animation: vexora-led-scroll 24s linear infinite;
+  animation: vexora-led-scroll 18s linear infinite !important;
 }
 .vexora-led-track > div {
   flex: 0 0 auto;
   white-space: nowrap;
 }
-.vexora-led-track:hover { animation-play-state: paused; }
-@media (prefers-reduced-motion: reduce) {
-  .vexora-led-track { animation: none; transform: none; }
-}
+.vexora-led-track:hover { animation-play-state: paused !important; }
