@@ -51,7 +51,7 @@ export function KeyboardPanel({ selected, onSelect, editMode }: Props) {
 
   // Keep the keyboard large while scaling its keys to fit the available width.
   // The parent layout provides the container query width (cqi).
-  const unit = `clamp(2.2rem, calc((100cqi - 4rem) / 18), ${5.2 * st.padScale}rem)`;
+  const unit = `clamp(1.65rem, calc((100cqi - 3rem) / 20), ${3.6 * st.padScale}rem)`;
 
   if (st.view === "grid") {
     const codes = layoutCodes(st.layout).filter((c) => bank.pads[c]);
