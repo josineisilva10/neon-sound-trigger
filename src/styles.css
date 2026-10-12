@@ -166,6 +166,12 @@
     padding: clamp(3px, 0.45cqi, 7px);
     border-radius: 0.55rem;
   }
+
+  .keyboard-fit-panel .keyboard-nav .padkey {
+    flex: 0 0 calc(var(--u) * var(--w, 1));
+    width: calc(var(--u) * var(--w, 1));
+    min-width: 0;
+  }
   .keyboard-fit-panel .padkey[data-spacebar="true"] {
     flex: 0 0 calc(var(--u) * 6.25);
     width: calc(var(--u) * 6.25);
