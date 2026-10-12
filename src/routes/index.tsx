@@ -16,10 +16,10 @@ import { SettingsDialog } from "@/components/vexora/Settings";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "VEXORA SAMPLER — Disparo de áudio pelo teclado" },
-      { name: "description", content: "Sampler profissional: associe sons a qualquer tecla, LEDs neon, bancos, biblioteca e papel de parede personalizado." },
-      { property: "og:title", content: "VEXORA SAMPLER" },
-      { property: "og:description", content: "Transforme o teclado do computador em um painel de disparo de sons." },
+      { title: "ZENTRIX SAMPLER — Disparo de áudio pelo teclado" },
+      { name: "description", content: "ZENTRIX: sampler profissional para DJs com bancos, vinhetas, locuções, efeitos e papel de parede personalizado." },
+      { property: "og:title", content: "ZENTRIX SAMPLER" },
+      { property: "og:description", content: "ZENTRIX — painel profissional para disparo de vinhetas, locuções e efeitos para DJs." },
     ],
   }),
   component: App,
@@ -97,7 +97,7 @@ function App() {
       <main className="grid min-w-0 grid-cols-1 items-start gap-1.5 p-1.5 lg:grid-cols-[190px_minmax(0,1fr)]">
         <aside className="flex min-w-0 flex-col gap-1.5">
           <div className="panel flex min-h-[42px] items-center justify-center overflow-hidden px-1 py-0.5">
-            <h1 className="text-center font-display text-lg font-extrabold leading-none tracking-[0.16em] text-neon-green neon-text">VEXORA<br /><span className="text-neon-cyan">SAMPLER</span></h1>
+            <h1 className="text-center font-display text-lg font-extrabold leading-none tracking-[0.16em] text-neon-green neon-text">ZENTRIX<br /><span className="text-neon-cyan">SAMPLER</span></h1>
           </div>
           <SidePanel selected={selected} />
         </aside>
