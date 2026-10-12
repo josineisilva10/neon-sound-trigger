@@ -51,7 +51,7 @@ export function KeyboardPanel({ selected, onSelect, editMode }: Props) {
 
   // Keep the keyboard large while scaling its keys to fit the available width.
   // The parent layout provides the container query width (cqi).
-  const unit = `clamp(2.4rem, calc((100cqi - 1rem) / 17.5), ${4.5 * st.padScale}rem)`;
+  const unit = `clamp(2.2rem, calc((100cqi - 1rem) / 18.5), ${4.5 * st.padScale}rem)`;
   const navUnit = unit;
 
   if (st.view === "grid") {
@@ -75,16 +75,18 @@ export function KeyboardPanel({ selected, onSelect, editMode }: Props) {
   const compactRows = mainRows(st.layout).map((row, index) => {
     if (index === 2) return row.filter((key) => !("code" in key) || key.code !== "CapsLock");
     if (index === 3) return row.filter((key) => !("code" in key) || (key.code !== "ShiftLeft" && key.code !== "ShiftRight"));
-    if (index === 4) return row.filter((key) => "code" in key && key.code === "Space").map((key) => ({ ...key, w: 3.5 }));
+    if (index === 4) return [{ code: "Space", w: 7.5 }];
     return row;
   });
 
   return (
     <div className="panel keyboard-fit-panel p-1" style={{ ["--u" as string]: unit }}>
       <div className="flex w-full min-w-0 items-start gap-1 overflow-x-auto">
-        <div className="flex w-max min-w-0 flex-none flex-col gap-0">
+        <div className="flex min-w-0 flex-1 flex-col gap-0">
+          <div className="w-full">
           {st.show.fn && <div className="mb-1">{renderRows([FUNCTION_ROW])}</div>}
           {renderRows(compactRows)}
+          </div>
         </div>
         {st.show.nav && <div className="flex w-max flex-none flex-col gap-0" style={{ ["--u" as string]: navUnit, marginLeft: "-0.75rem" }}>{st.show.fn && <div className="mb-1 h-[var(--u)]" />}{renderRows(NAV_ROWS)}</div>}
       </div>
