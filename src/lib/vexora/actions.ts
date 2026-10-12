@@ -81,6 +81,8 @@ export function preloadBank() {
 }
 
 // ---------- triggering ----------
+let latestTriggerRequest = 0;
+
 export function trigger(bankId: string, code: string) {
   const s = store.get();
   const bank = s.banks.find((b) => b.id === bankId);
@@ -92,12 +94,24 @@ export function trigger(bankId: string, code: string) {
     if (pad.retrigger === "stop") return engine.stopKey(key, pad.fadeOut);
     if (pad.retrigger === "restart") engine.stopKey(key, 0);
   }
+
+  // Only one pad audio at a time: stop the previous sound as soon as another pad is triggered.
+  const requestId = ++latestTriggerRequest;
+  for (const voice of [...engine.voices.values()]) {
+    if (voice.key !== key) engine.stopVoice(voice.id, 0);
+  }
+
   const name = pad.name || s.library.find((l) => l.id === pad.fileId)?.name || code;
-  const go = (b: AudioBuffer) =>
+  const go = (b: AudioBuffer) => {
+    // Prevent a slow file load from starting an older sound after a newer key was pressed.
+    if (requestId !== latestTriggerRequest) return;
     engine.play(b, { key, fileId: pad.fileId!, name, volume: pad.volume, loop: pad.mode === "loop", fadeIn: pad.fadeIn, startAt: pad.startAt, group: pad.group });
+  };
   const cached = engine.buffers.get(pad.fileId);
   if (cached) go(cached);
-  else engine.load(pad.fileId).then(go).catch(() => toast.error(`"${name}": arquivo indisponível. Verifique a biblioteca.`));
+  else engine.load(pad.fileId).then(go).catch(() => {
+    if (requestId === latestTriggerRequest) toast.error(`"${name}": arquivo indisponível. Verifique a biblioteca.`);
+  });
 }
 
 export function stopPad(bankId: string, code: string) {
