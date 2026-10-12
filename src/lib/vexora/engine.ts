@@ -184,6 +184,19 @@ class AudioEngine {
     }
     return Math.min(v.duration, v.startAt + t);
   }
+  spectrum(size = 48): number[] {
+    if (!this.ctx) return Array.from({ length: size }, () => 0);
+    const data = new Uint8Array(this.aL.frequencyBinCount);
+    this.aL.getByteFrequencyData(data);
+    return Array.from({ length: size }, (_, i) => {
+      const start = Math.floor((i / size) * data.length);
+      const end = Math.max(start + 1, Math.floor(((i + 1) / size) * data.length));
+      let peak = 0;
+      for (let j = start; j < Math.min(end, data.length); j++) peak = Math.max(peak, data[j]);
+      return peak / 255;
+    });
+  }
+
   levels(): [number, number] {
     if (!this.ctx) return [0, 0];
     const peak = (a: AnalyserNode) => {
