@@ -41,7 +41,7 @@ Deno.serve(async (req) => {
   if (req.method === "GET") {
     const { data, error } = await supabase
       .from("vexora_licenses")
-      .select("id,email,status,max_activations,expires_at,created_at,revoked_at,vexora_license_activations(count)")
+      .select("id,email,status,max_activations,expires_at,created_at,revoked_at,vexora_license_activations(count,email)")
       .order("created_at", { ascending: false })
       .limit(200);
     if (error) return response({ error: "Não foi possível carregar as licenças." }, 500);
@@ -56,12 +56,12 @@ Deno.serve(async (req) => {
   }
 
   if (req.method === "POST") {
-    const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
+    const email = typeof body.email === "string" && body.email.trim() ? body.email.trim().toLowerCase() : null;
     const licenseKey = typeof body.licenseKey === "string" ? body.licenseKey.trim() : "";
     const maxActivations = Number(body.maxActivations);
     const expiresAt = body.expiresAt === null || body.expiresAt === "" ? null : String(body.expiresAt);
-    if (!email.includes("@") || licenseKey.length < 16 || !Number.isInteger(maxActivations) || maxActivations < 1 || maxActivations > 20) {
-      return response({ error: "Informe e-mail válido, chave com pelo menos 16 caracteres e limite de 1 a 20 dispositivos." }, 400);
+    if (licenseKey.length < 16 || !Number.isInteger(maxActivations) || maxActivations < 1 || maxActivations > 20) {
+      return response({ error: "Informe uma chave com pelo menos 16 caracteres e limite de 1 a 20 dispositivos." }, 400);
     }
     if (expiresAt && Number.isNaN(Date.parse(expiresAt))) return response({ error: "Data de validade inválida." }, 400);
     const { data, error } = await supabase.from("vexora_licenses").insert({
