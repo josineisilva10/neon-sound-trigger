@@ -17,6 +17,7 @@ export type Database = {
       vexora_license_activations: {
         Row: {
           activated_at: string
+          email: string | null
           id: string
           installation_id: string
           last_seen_at: string
@@ -24,6 +25,7 @@ export type Database = {
         }
         Insert: {
           activated_at?: string
+          email?: string | null
           id?: string
           installation_id: string
           last_seen_at?: string
@@ -31,6 +33,7 @@ export type Database = {
         }
         Update: {
           activated_at?: string
+          email?: string | null
           id?: string
           installation_id?: string
           last_seen_at?: string
@@ -49,7 +52,7 @@ export type Database = {
       vexora_licenses: {
         Row: {
           created_at: string
-          email: string
+          email: string | null
           expires_at: string | null
           id: string
           key_hash: string
@@ -59,7 +62,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
-          email: string
+          email?: string | null
           expires_at?: string | null
           id?: string
           key_hash: string
@@ -69,7 +72,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
-          email?: string
+          email?: string | null
           expires_at?: string | null
           id?: string
           key_hash?: string
