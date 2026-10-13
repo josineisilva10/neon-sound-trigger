@@ -109,7 +109,15 @@ export function ActivationGate({ children }: { children: ReactNode }) {
   }
 
   if (!ready) return <div className="grid min-h-screen place-items-center bg-[#05070c] text-cyan-300">Carregando VEXORA SAMPLER…</div>;
-  if (activation) return <>{children}</>;\n  if (trialEndsAt !== null && remainingMs > 0) return <><div className="fixed right-3 top-3 z-[100] rounded-lg border border-cyan-400/50 bg-slate-950/95 px-3 py-2 text-sm font-bold text-cyan-200 shadow-lg">Teste grátis: {Math.floor(remainingMs / 60000)}:{String(Math.floor((remainingMs % 60000) / 1000)).padStart(2, "0")} restantes</div>{children}</>;
+  if (activation) return <>{children}</>;
+  if (trialEndsAt !== null && remainingMs > 0) return (
+    <>
+      <div className="fixed right-3 top-3 z-[100] rounded-lg border border-cyan-400/50 bg-slate-950/95 px-3 py-2 text-sm font-bold text-cyan-200 shadow-lg">
+        Teste grátis: {Math.floor(remainingMs / 60000)}:{String(Math.floor((remainingMs % 60000) / 1000)).padStart(2, "0")} restantes
+      </div>
+      {children}
+    </>
+  );
 
   return (
     <main className="grid min-h-screen place-items-center bg-[#05070c] p-4 text-white">
