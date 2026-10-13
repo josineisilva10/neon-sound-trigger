@@ -135,7 +135,6 @@ function AudioInfoPanel({ code, ledActive, onToggleLed }: { code: string | null;
         </>
       )}
     </div>
-    </ActivationGate>
   );
 }
 
@@ -306,5 +305,6 @@ function App() {
       </main>
       {showSettings && <SettingsDialog onClose={() => setShowSettings(false)} />}
     </div>
+    </ActivationGate>
   );
 }
