@@ -35,7 +35,7 @@ function LicenseAdminPage() {
     if (!apiUrl) throw new Error("Lovable Cloud não está configurado neste ambiente.");
     const response = await fetch(apiUrl + "/functions/v1/vexora-license-admin", {
       method,
-      headers: { "Content-Type": "application/json", "x-admin-token": token },
+      headers: { "Content-Type": "application/json", "x-admin-token": token, ...(publishableKey ? { apikey: publishableKey } : {}) },
       ...(body ? { body: JSON.stringify(body) } : {}),
     });
     const result = await response.json().catch(() => ({})) as { error?: string; licenses?: License[]; license?: License };
