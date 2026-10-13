@@ -25,7 +25,7 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Generate VEXORA Windows icon from the actual logo
+      - name: Generate multi-size VEXORA Windows icon from the actual logo
         shell: pwsh
         run: |
           $toolDir = Join-Path $env:RUNNER_TEMP "vexora-icon-tool"
@@ -36,32 +36,39 @@ jobs:
           const path = require("node:path");
           const { Resvg } = require(path.join(process.env.RUNNER_TEMP, "vexora-icon-tool", "node_modules", "@resvg", "resvg-js"));
           const svg = fs.readFileSync("public/vexora-logo.svg", "utf8");
-          const png = new Resvg(svg, { fitTo: { mode: "width", value: 256 } }).render().asPng();
-          // A Windows ICO can contain a PNG payload. Build the ICO directory/header directly,
-          // avoiding png-to-ico CommonJS/ESM export differences across package versions.
+          const sizes = [16, 24, 32, 48, 64, 128, 256];
+          const images = sizes.map(size => new Resvg(svg, { fitTo: { mode: "width", value: size } }).render().asPng());
           const header = Buffer.alloc(6);
-          header.writeUInt16LE(0, 0); // reserved
-          header.writeUInt16LE(1, 2); // ICO type
-          header.writeUInt16LE(1, 4); // one image
-          const entry = Buffer.alloc(16);
-          entry.writeUInt8(0, 0); // width 256 is encoded as 0
-          entry.writeUInt8(0, 1); // height 256 is encoded as 0
-          entry.writeUInt8(0, 2); // palette
-          entry.writeUInt8(0, 3); // reserved
-          entry.writeUInt16LE(1, 4); // color planes
-          entry.writeUInt16LE(32, 6); // bits per pixel
-          entry.writeUInt32LE(png.length, 8);
-          entry.writeUInt32LE(header.length + entry.length, 12);
-          const ico = Buffer.concat([header, entry, png]);
+          header.writeUInt16LE(0, 0);
+          header.writeUInt16LE(1, 2);
+          header.writeUInt16LE(images.length, 4);
+          const entries = images.map((png, i) => {
+            const size = sizes[i];
+            const entry = Buffer.alloc(16);
+            entry.writeUInt8(size === 256 ? 0 : size, 0);
+            entry.writeUInt8(size === 256 ? 0 : size, 1);
+            entry.writeUInt8(0, 2);
+            entry.writeUInt8(0, 3);
+            entry.writeUInt16LE(1, 4);
+            entry.writeUInt16LE(32, 6);
+            entry.writeUInt32LE(png.length, 8);
+            entry.writeUInt32LE(6 + images.length * 16 + images.slice(0, i).reduce((sum, img) => sum + img.length, 0), 12);
+            return entry;
+          });
+          const ico = Buffer.concat([header, ...entries, ...images]);
           fs.writeFileSync("src-tauri/icons/icon.ico", ico);
-          // Verify the ICO directory points to the embedded PNG payload.
           const written = fs.readFileSync("src-tauri/icons/icon.ico");
-          if (written.readUInt16LE(2) !== 1 || written.readUInt16LE(4) !== 1 || written.readUInt32LE(18) !== 22) {
-            throw new Error("O cabeçalho do ícone ICO gerado é inválido.");
+          if (written.readUInt16LE(2) !== 1 || written.readUInt16LE(4) !== sizes.length) throw new Error("Cabeçalho ICO inválido.");
+          for (let i = 0; i < sizes.length; i++) {
+            const entryOffset = 6 + i * 16;
+            const size = written.readUInt8(entryOffset) || 256;
+            const byteCount = written.readUInt32LE(entryOffset + 8);
+            const imageOffset = written.readUInt32LE(entryOffset + 12);
+            if (size !== sizes[i] || written.subarray(imageOffset, imageOffset + 4).toString("hex") !== "89504e47" || byteCount !== images[i].length) {
+              throw new Error("Imagem ICO inválida no tamanho " + sizes[i] + "px.");
+            }
           }
-          if (written.readUInt32LE(14) !== png.length || written.subarray(22, 26).toString("hex") !== "89504e47") {
-            throw new Error("O conteúdo PNG dentro do ICO é inválido.");
-          }
+          console.log("Ícone VEXORA gerado e validado nos tamanhos: " + sizes.join(", ") + " px.");
           '@
           $scriptPath = Join-Path $env:RUNNER_TEMP "make-vexora-icon.cjs"
           Set-Content -Path $scriptPath -Value $script -Encoding utf8
