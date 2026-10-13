@@ -30,6 +30,7 @@ function LicenseAdminPage() {
   const [notice, setNotice] = useState("");
   const [busy, setBusy] = useState(false);
   const apiUrl = (import.meta.env["VITE_SUPABASE_URL"] as string | undefined)?.replace(/\/+$/, "");
+  const publishableKey = import.meta.env["VITE_SUPABASE_PUBLISHABLE_KEY"] as string | undefined;
 
   const request = useCallback(async (method: "GET" | "POST" | "PATCH", body?: Record<string, unknown>) => {
     if (!apiUrl) throw new Error("Lovable Cloud não está configurado neste ambiente.");
