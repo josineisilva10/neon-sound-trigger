@@ -14,13 +14,88 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      vexora_license_activations: {
+        Row: {
+          activated_at: string
+          id: string
+          installation_id: string
+          last_seen_at: string
+          license_id: string
+        }
+        Insert: {
+          activated_at?: string
+          id?: string
+          installation_id: string
+          last_seen_at?: string
+          license_id: string
+        }
+        Update: {
+          activated_at?: string
+          id?: string
+          installation_id?: string
+          last_seen_at?: string
+          license_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vexora_license_activations_license_id_fkey"
+            columns: ["license_id"]
+            isOneToOne: false
+            referencedRelation: "vexora_licenses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vexora_licenses: {
+        Row: {
+          created_at: string
+          email: string
+          expires_at: string | null
+          id: string
+          key_hash: string
+          max_activations: number
+          revoked_at: string | null
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          expires_at?: string | null
+          id?: string
+          key_hash: string
+          max_activations?: number
+          revoked_at?: string | null
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          expires_at?: string | null
+          id?: string
+          key_hash?: string
+          max_activations?: number
+          revoked_at?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      activate_vexora_license: {
+        Args: {
+          p_email: string
+          p_installation_id: string
+          p_license_key: string
+        }
+        Returns: Json
+      }
+      verify_vexora_activation: {
+        Args: { p_installation_id: string; p_license_id: string }
+        Returns: Json
+      }
     }
     Enums: {
       [_ in never]: never
