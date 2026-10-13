@@ -1,4 +1,5 @@
 import { toast } from "sonner";
+import { isTrialExportBlocked } from "./trial";
 import { delFile, getFile, listFileIds, putFile } from "./db";
 import { computePeaks, engine } from "./engine";
 import { activeBank, newId, store, validateState, type LibItem, type State } from "./store";
