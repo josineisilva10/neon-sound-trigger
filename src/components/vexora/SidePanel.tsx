@@ -32,9 +32,9 @@ export function SidePanel({ selected }: { selected: string | null }) {
           <span className="font-display text-[10px] tracking-widest text-neon-cyan">MASTER</span>
           <span className={`font-mono text-[8px] ${voices.length ? "text-neon-green neon-text" : "text-muted-foreground"}`}>{engine.paused ? "PAUSADO" : voices.length ? `● ${voices.length} ATIVO(S)` : "○ PARADO"}</span>
         </div>
-        <div className="flex items-stretch gap-1">
+        <div className="flex items-stretch gap-0.5">
           <StereoMeter />
-          <div className="flex flex-1 flex-col justify-between gap-0.5">
+          <div className="flex flex-1 flex-col justify-between gap-0">
             <label className="text-[10px] text-muted-foreground">Volume {Math.round(st.master * 100)}%
               <input className="w-full" type="range" min={0} max={1} step={0.01} value={st.master} onChange={(e) => setSettings({ master: +e.target.value })} />
             </label>
@@ -64,20 +64,20 @@ export function SidePanel({ selected }: { selected: string | null }) {
         </ul>
       </div>
 
-      <div className="panel p-3">
-        <div className="mb-1 flex items-center justify-between">
+      <div className="panel p-1">
+        <div className="mb-0.5 flex items-center justify-between">
           <span className="font-display text-[10px] tracking-widest text-neon-orange">BANCOS</span>
           <button className="btn !px-1.5 !py-0.5" onClick={addBank} title="Adicionar banco"><Plus className="size-3" /></button>
         </div>
-        <ul className="space-y-1">
+        <ul className="space-y-0">
           {s.banks.map((b) => (
             <li key={b.id} className={`flex items-center gap-1 rounded px-1 ${b.id === s.activeBank ? "bg-neon-orange/15 ring-1 ring-neon-orange" : ""}`}>
               <button className="flex-1 truncate py-0 text-left text-[10px]" onClick={() => switchBank(b.id)} onDoubleClick={() => { const n = prompt("Renomear banco", b.name); if (n) renameBank(b.id, n); }}>
                 {b.name} <span className="text-[10px] text-muted-foreground">({Object.keys(b.pads).length})</span>
               </button>
               <button title="Duplicar" onClick={() => duplicateBank(b.id)} className="p-0.5 text-muted-foreground hover:text-foreground"><Copy className="size-3" /></button>
-              <button title="Exportar banco" onClick={() => exportProject(false, b.id)} className="p-1 text-muted-foreground hover:text-foreground"><Download className="size-3" /></button>
-              <button title="Remover" onClick={() => confirm(`Remover ${b.name}?`) && removeBank(b.id)} className="p-1 text-muted-foreground hover:text-destructive"><Trash2 className="size-3" /></button>
+              <button title="Exportar banco" onClick={() => exportProject(false, b.id)} className="p-0.5 text-muted-foreground hover:text-foreground"><Download className="size-3" /></button>
+              <button title="Remover" onClick={() => confirm(`Remover ${b.name}?`) && removeBank(b.id)} className="p-0.5 text-muted-foreground hover:text-destructive"><Trash2 className="size-3" /></button>
             </li>
           ))}
         </ul>
