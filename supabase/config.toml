@@ -1,1 +1,4 @@
 project_id = "xdhibwyrttlzhucarfky"
+
+[functions.vexora-license-admin]
+verify_jwt = false
