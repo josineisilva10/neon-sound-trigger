@@ -104,7 +104,7 @@ interface KeyProps {
   onSelect: (code: string) => void;
 }
 
-function PadKey({ code, w, pad, lib, selected, reserved, playing, label, barRef, onClick, onDoubleClick, onDropKey, onDropFile }: KeyProps) {
+function PadKey({ code, w, pad, lib, selected, reserved, playing, label, barRef, onClick, onDoubleClick, onDropKey, onDropFile, onSelect }: KeyProps) {
   const p = pad ?? defaultPad();
   const item = pad?.fileId ? lib.get(pad.fileId) : undefined;
   const assigned = !!pad?.fileId;
