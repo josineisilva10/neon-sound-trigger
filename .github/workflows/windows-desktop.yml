@@ -56,10 +56,10 @@ jobs:
           fs.writeFileSync("src-tauri/icons/icon.ico", ico);
           // Verify the ICO directory points to the embedded PNG payload.
           const written = fs.readFileSync("src-tauri/icons/icon.ico");
-          if (written.readUInt16LE(2) !== 1 || written.readUInt16LE(4) !== 1 || written.readUInt32LE(14) !== 22) {
+          if (written.readUInt16LE(2) !== 1 || written.readUInt16LE(4) !== 1 || written.readUInt32LE(18) !== 22) {
             throw new Error("O cabeçalho do ícone ICO gerado é inválido.");
           }
-          if (written.readUInt32LE(18) !== png.length || written.subarray(22, 26).toString("hex") !== "89504e47") {
+          if (written.readUInt32LE(14) !== png.length || written.subarray(22, 26).toString("hex") !== "89504e47") {
             throw new Error("O conteúdo PNG dentro do ICO é inválido.");
           }
           '@
