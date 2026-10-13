@@ -14,6 +14,7 @@ import { SidePanel } from "@/components/vexora/SidePanel";
 import { SettingsDialog } from "@/components/vexora/Settings";
 import { fmtTime } from "@/lib/vexora/engine";
 import { Waveform } from "@/components/vexora/Meters";
+import { ActivationGate } from "@/components/vexora/ActivationGate";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -262,6 +263,7 @@ function App() {
     : { backgroundImage: 'url("/vexora-wallpaper.svg")', backgroundSize: "100% 100%", backgroundPosition: "center", backgroundRepeat: "no-repeat" };
 
   return (
+    <ActivationGate>
     <div className="relative min-h-screen" data-anim={st.animations ? "on" : "off"} style={{ ["--panel-alpha" as string]: `${wallStyle ? w.panelOpacity : 85}%` }}>
       {wallStyle && w.target === "full" && <div className="fixed inset-0 -z-10" style={wallStyle}><div className="absolute inset-0 bg-background" style={{ opacity: w.dim }} /></div>}
       <Toaster theme="dark" position="bottom-right" richColors />
@@ -303,5 +305,6 @@ function App() {
       </main>
       {showSettings && <SettingsDialog onClose={() => setShowSettings(false)} />}
     </div>
+    </ActivationGate>
   );
 }
