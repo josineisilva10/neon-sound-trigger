@@ -82,6 +82,18 @@ export function ActivationGate({ children }: { children: ReactNode }) {
     return () => { cancelled = true; };
   }, []);
 
+  useEffect(() => {
+    if (trialEndsAt === null) return;
+    const updateCountdown = () => {
+      const nextRemaining = Math.max(0, trialEndsAt - Date.now());
+      setRemainingMs(nextRemaining);
+      if (nextRemaining === 0) setTrialEndsAt(null);
+    };
+    updateCountdown();
+    const intervalId = window.setInterval(updateCountdown, 250);
+    return () => window.clearInterval(intervalId);
+  }, [trialEndsAt]);
+
   function onStartTrial() {
     const startedAt = startTrial();
     setTrialAvailable(false);
