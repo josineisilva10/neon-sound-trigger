@@ -6,7 +6,7 @@
   "build": {
     "beforeDevCommand": "bun run dev -- --host 127.0.0.1",
     "devUrl": "http://127.0.0.1:5173",
-    "beforeBuildCommand": "bun run build",
+    "beforeBuildCommand": "bunx --yes @tauri-apps/cli icon public/vexora-logo.svg && bun run build",
     "frontendDist": "../.output/public"
   },
   "app": {
