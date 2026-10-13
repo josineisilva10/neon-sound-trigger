@@ -24,7 +24,7 @@ async function activate(email: string, licenseKey: string): Promise<ActivationRe
   const url = import.meta.env["VITE_SUPABASE_URL"] as string | undefined;
   const apiKey = import.meta.env["VITE_SUPABASE_PUBLISHABLE_KEY"] as string | undefined;
   if (!url || !apiKey) throw new Error("O backend do Lovable Cloud não está configurado neste ambiente.");
-  const response = await fetch(`${url.replace(/\/+$/, "")}/rest/v1/rpc/activate_vexora_license`, {
+  const response = await fetch(`${url.replace(/[/]+$/, "")}/rest/v1/rpc/activate_vexora_license`, {
     method: "POST",
     headers: { "Content-Type": "application/json", apikey: apiKey, Authorization: `Bearer ${apiKey}` },
     body: JSON.stringify({ p_email: email.trim(), p_license_key: licenseKey.trim(), p_installation_id: getInstallationId() }),
@@ -54,7 +54,7 @@ export function ActivationGate({ children }: { children: ReactNode }) {
             const url = import.meta.env.VITE_SUPABASE_URL as string | undefined;
             const apiKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string | undefined;
             if (url && apiKey) {
-              const response = await fetch(url.replace(/\/+$/, "") + '/rest/v1/rpc/verify_vexora_activation', {
+              const response = await fetch(url.replace(/[/]+$/, "") + '/rest/v1/rpc/verify_vexora_activation', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', apikey: apiKey, Authorization: 'Bearer ' + apiKey },
                 body: JSON.stringify({ p_license_id: parsed.licenseId, p_installation_id: installationId }),
