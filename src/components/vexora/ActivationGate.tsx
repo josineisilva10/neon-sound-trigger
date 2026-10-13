@@ -80,7 +80,14 @@ export function ActivationGate({ children }: { children: ReactNode }) {
     return () => { cancelled = true; };
   }, []);
 
-  function onStartTrial() {\n    const startedAt = startTrial();\n    setTrialAvailable(false);\n    setTrialEndsAt(startedAt + TRIAL_DURATION_MS);\n    setRemainingMs(Math.max(0, startedAt + TRIAL_DURATION_MS - Date.now()));\n  }\n\n  async function onSubmit(event: FormEvent<HTMLFormElement>) {
+  function onStartTrial() {
+    const startedAt = startTrial();
+    setTrialAvailable(false);
+    setTrialEndsAt(startedAt + TRIAL_DURATION_MS);
+    setRemainingMs(Math.max(0, startedAt + TRIAL_DURATION_MS - Date.now()));
+  }
+
+  async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setBusy(true);
     setError("");
