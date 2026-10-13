@@ -69,6 +69,9 @@ function LicenseAdminPage() {
     setBusy(true); setError(""); setNotice("");
     try {
       const result = await request("POST", {
+        // Compatibility with a Cloud Edge Function that has not yet been redeployed:
+        // this is a non-customer placeholder; the real customer email is saved at activation.
+        email: `pending-${crypto.randomUUID()}@vexora.invalid`,
         licenseKey: key, maxActivations: Number(maxActivations),
         expiresAt: expiresAt ? new Date(expiresAt).toISOString() : null,
       });
