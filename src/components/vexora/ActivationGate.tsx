@@ -43,24 +43,46 @@ export function ActivationGate({ children }: { children: React.ReactNode }) {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(ACTIVATION_KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw) as Activation;
-        if (parsed.licenseId && parsed.email) setActivation(parsed);
+    let cancelled = false;
+    const initialize = async () => {
+      try {
+        const installationId = getInstallationId();
+        const raw = localStorage.getItem(ACTIVATION_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw) as Activation;
+          if (parsed.licenseId && parsed.email) {
+            const url = import.meta.env.VITE_SUPABASE_URL as string | undefined;
+            const apiKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string | undefined;
+            if (url && apiKey) {
+              const response = await fetch(url.replace(/\\/+$/, '') + '/rest/v1/rpc/verify_vexora_activation', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', apikey: apiKey, Authorization: 'Bearer ' + apiKey },
+                body: JSON.stringify({ p_license_id: parsed.licenseId, p_installation_id: installationId }),
+              });
+              const checked = response.ok ? await response.json() as ActivationResult : { ok: false };
+              if (checked.ok && !cancelled) setActivation({ ...parsed, expiresAt: checked.expires_at ?? parsed.expiresAt });
+              else localStorage.removeItem(ACTIVATION_KEY);
+            } else {
+              localStorage.removeItem(ACTIVATION_KEY);
+            }
+          } else {
+            localStorage.removeItem(ACTIVATION_KEY);
+          }
+        }
+        let startedAt = Number(localStorage.getItem(TRIAL_KEY));
+        if (!Number.isFinite(startedAt) || startedAt <= 0) {
+          startedAt = Date.now();
+          localStorage.setItem(TRIAL_KEY, String(startedAt));
+        }
+        if (!cancelled) setTrialAllowed(Date.now() - startedAt < TRIAL_MS);
+      } catch {
+        if (!cancelled) setError('Não foi possível verificar a ativação neste navegador.');
+      } finally {
+        if (!cancelled) setReady(true);
       }
-      let startedAt = Number(localStorage.getItem(TRIAL_KEY));
-      if (!Number.isFinite(startedAt) || startedAt <= 0) {
-        startedAt = Date.now();
-        localStorage.setItem(TRIAL_KEY, String(startedAt));
-      }
-      setTrialAllowed(Date.now() - startedAt < TRIAL_MS);
-      getInstallationId();
-    } catch {
-      setError("Não foi possível ler o estado de ativação neste navegador.");
-    } finally {
-      setReady(true);
-    }
+    };
+    void initialize();
+    return () => { cancelled = true; };
   }, []);
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
