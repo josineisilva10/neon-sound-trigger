@@ -101,6 +101,7 @@ export function KeyboardPanel({ selected, onSelect, editMode }: Props) {
 interface KeyProps {
   code: string; w: number; pad?: Pad; lib: Map<string, LibItem>; selected: boolean; reserved: boolean; playing: boolean; label: string;
   barRef: (el: HTMLDivElement | null) => void; onClick: () => void; onDoubleClick: () => void; onDropKey: (from: string) => void; onDropFile: (id: string) => void;
+  onSelect: (code: string) => void;
 }
 
 function PadKey({ code, w, pad, lib, selected, reserved, playing, label, barRef, onClick, onDoubleClick, onDropKey, onDropFile }: KeyProps) {
