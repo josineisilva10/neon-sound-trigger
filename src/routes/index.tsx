@@ -233,7 +233,7 @@ function App() {
       {wallStyle && w.target === "full" && <div className="fixed inset-0 -z-10" style={wallStyle}><div className="absolute inset-0 bg-background" style={{ opacity: w.dim }} /></div>}
       <Toaster theme="dark" position="bottom-right" richColors />
 
-      <main className="grid min-w-0 grid-cols-1 items-start gap-1 px-1 pb-1 pt-0 lg:grid-cols-[176px_minmax(0,1fr)]">
+      <main className="grid min-w-0 grid-cols-1 items-start gap-1 px-1 pb-1 pt-0 lg:grid-cols-[184px_minmax(0,1fr)]">
         <aside className="flex min-w-0 flex-col gap-1">
           <div className="panel flex min-h-[38px] items-center justify-center gap-1 overflow-hidden px-1 py-0.5">
             <img src="/vexora-logo.svg" alt="Símbolo VEXORA" className="size-7 shrink-0 drop-shadow-[0_0_7px_#00d9ff]" />
@@ -243,9 +243,9 @@ function App() {
           <AudioInfoPanel code={selected} ledActive={ledActive} onToggleLed={() => setLedActive((v) => !v)} />
         </aside>
         <section className="flex min-w-0 flex-col gap-1">
-          <div data-tauri-drag-region className="relative h-10 min-h-10 w-full overflow-hidden rounded-none border-0" style={bannerWallStyle}>
-            {(!wall || !w.enabled) && <div className="absolute inset-0 bg-background" />}
-            {wall && w.enabled && <div className="absolute inset-0 bg-background" style={{ opacity: w.dim }} />}
+          <div data-tauri-drag-region className="relative h-[clamp(76px,12vh,112px)] min-h-0 w-full overflow-hidden rounded-none border-0" style={bannerWallStyle}>
+            
+            {wall && w.enabled && <div className="absolute inset-0 bg-background" style={{ opacity: w.dim }} /> }
             <div className="absolute right-1 top-1 z-10 flex gap-1">
               <button className="btn !p-1.5" onClick={() => setShowSettings(true)} aria-label="Configurações"><Cog className="size-4" /></button>
               <button className="btn !p-1.5" onClick={() => windowControl("min")} aria-label="Minimizar VEXORA SAMPLER"><Minus className="size-4" /></button>
