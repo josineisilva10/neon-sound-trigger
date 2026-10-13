@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { KeyRound, ShieldCheck, LoaderCircle } from "lucide-react";
 
 const ACTIVATION_KEY = "vexora.license.activation.v1";
@@ -21,8 +21,8 @@ function getInstallationId(): string {
 }
 
 async function activate(email: string, licenseKey: string): Promise<ActivationResult> {
-  const url = import.meta.env.VITE_SUPABASE_URL as string | undefined;
-  const apiKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string | undefined;
+  const url = import.meta.env["VITE_SUPABASE_URL"] as string | undefined;
+  const apiKey = import.meta.env["VITE_SUPABASE_PUBLISHABLE_KEY"] as string | undefined;
   if (!url || !apiKey) throw new Error("O backend do Lovable Cloud não está configurado neste ambiente.");
   const response = await fetch(`${url.replace(/\/+$/, "")}/rest/v1/rpc/activate_vexora_license`, {
     method: "POST",
@@ -33,7 +33,7 @@ async function activate(email: string, licenseKey: string): Promise<ActivationRe
   return await response.json() as ActivationResult;
 }
 
-export function ActivationGate({ children }: { children: React.ReactNode }) {
+export function ActivationGate({ children }: { children: ReactNode }) {
   const [activation, setActivation] = useState<Activation | null>(null);
   const [trialAllowed, setTrialAllowed] = useState(false);
   const [ready, setReady] = useState(false);
