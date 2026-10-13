@@ -40,6 +40,7 @@ export function KeyboardPanel({ selected, onSelect, editMode }: Props) {
     onDoubleClick: () => { if (!editMode) trigger(bank.id, code); },
     onDropKey: (from: string) => swapPads(bank.id, from, code),
     onDropFile: (fileId: string) => { const l = lib.get(fileId); updatePad(bank.id, code, { fileId, name: bank.pads[code]?.name || l?.name || "" }); onSelect(code); },
+    onSelect,
   });
 
   const renderRows = (rows: Row[]) =>
