@@ -6,12 +6,13 @@ This feature is implemented on branch `feature/license-activation-cloud`. It is 
 
 - `supabase/migrations/20261013010000_vexora_license_activation.sql`: license and activation tables, RLS, and the `activate_vexora_license` RPC.
 - `supabase/migrations/20261013020000_vexora_license_revalidation.sql`: server-side activation status recheck.
+- `supabase/migrations/20261013030000_vexora_license_activation_concurrency.sql`: serializes activation attempts so simultaneous requests cannot exceed the device limit.
 - `src/components/vexora/ActivationGate.tsx`: activation UI and a five-minute browser trial gate.
 - The main VEXORA route wraps the sampler in the activation gate.
 
 ## Apply the migrations
 
-In the Lovable Cloud project connected to this repository, use the database migration workflow/SQL editor to apply both migration files in timestamp order. Do not apply them to an old, unrelated Supabase project.
+In the Lovable Cloud project connected to this repository, use the database migration workflow/SQL editor to apply all three migration files in timestamp order. Do not apply them to an old, unrelated Supabase project.
 
 ## Create a license (admin-only SQL)
 
