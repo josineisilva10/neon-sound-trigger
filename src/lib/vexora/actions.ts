@@ -261,6 +261,10 @@ function download(data: string, filename: string) {
 
 /** Format: see PROJECT_FORMAT.md. `files` is only present when the user explicitly packs audio. */
 export async function exportProject(pack: boolean, onlyBankId?: string) {
+  if (isTrialExportBlocked()) {
+    toast.error("A exportação de projetos fica disponível após ativar uma licença.");
+    return;
+  }
   const s = store.get();
   const payload: Record<string, unknown> = {
     format: "vexora-project", version: 1, exportedAt: new Date().toISOString(),
@@ -317,6 +321,10 @@ export function listBackups(): Backup[] {
   }
 }
 export function createBackup() {
+  if (isTrialExportBlocked()) {
+    toast.error("Backups ficam disponíveis após ativar uma licença.");
+    return;
+  }
   const s = store.get();
   const list = [{ date: new Date().toISOString(), name: s.projectName, state: s }, ...listBackups()].slice(0, 10);
   localStorage.setItem(BK, JSON.stringify(list));
