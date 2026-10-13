@@ -264,11 +264,11 @@ function App() {
 
   return (
     <ActivationGate>
-    <div className="relative min-h-screen" data-anim={st.animations ? "on" : "off"} style={{ ["--panel-alpha" as string]: `${wallStyle ? w.panelOpacity : 85}%` }}>
+    <div className="relative h-screen overflow-hidden" data-anim={st.animations ? "on" : "off"} style={{ ["--panel-alpha" as string]: `${wallStyle ? w.panelOpacity : 85}%` }}>
       {wallStyle && w.target === "full" && <div className="fixed inset-0 -z-10" style={wallStyle}><div className="absolute inset-0 bg-background" style={{ opacity: w.dim }} /></div>}
       <Toaster theme="dark" position="bottom-right" richColors />
 
-      <main className="grid min-w-0 grid-cols-1 items-start gap-1.5 p-1.5 lg:grid-cols-[190px_minmax(0,1fr)]">
+      <main className="grid h-full min-h-0 min-w-0 grid-cols-1 items-start gap-1.5 overflow-hidden p-1.5 lg:grid-cols-[190px_minmax(0,1fr)]">
         <aside className="flex min-w-0 flex-col gap-1.5">
           <div className="panel flex min-h-[48px] items-center justify-center gap-1.5 overflow-hidden px-1 py-1">
             <img src="/vexora-logo.svg" alt="Símbolo VEXORA" className="size-9 shrink-0 drop-shadow-[0_0_7px_#00d9ff]" />
@@ -277,9 +277,8 @@ function App() {
           <SidePanel selected={selected} />
           {st.show.editor && <AudioInfoPanel code={selected} ledActive={ledActive} onToggleLed={() => setLedActive((v) => !v)} />}
         </aside>
-        <section className="flex min-w-0 flex-col gap-1.5">
+        <section className="flex min-h-0 min-w-0 flex-col gap-1.5 overflow-hidden">
           <div className="relative aspect-[3/1] min-h-0 w-full overflow-hidden rounded-md border border-border" style={bannerWallStyle}>
-            {(!wall || !w.enabled) && <div className="absolute inset-0 bg-background" />}
             {wall && w.enabled && <div className="absolute inset-0 bg-background" style={{ opacity: w.dim }} />}
             <div className="absolute right-1 top-1 z-10 flex gap-1">
               <button className="btn !p-1.5" onClick={() => setShowSettings(true)} aria-label="Configurações"><Cog className="size-4" /></button>
