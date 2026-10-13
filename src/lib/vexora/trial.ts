@@ -28,3 +28,12 @@ export function isTrialActive(): boolean {
 export function trialHasBeenUsed(): boolean {
   return getTrialStartedAt() !== null;
 }
+
+export function isTrialExportBlocked(): boolean {
+  if (!trialHasBeenUsed()) return false;
+  try {
+    return !localStorage.getItem("vexora.license.activation.v1");
+  } catch {
+    return true;
+  }
+}
