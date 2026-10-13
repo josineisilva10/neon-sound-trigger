@@ -40,6 +40,7 @@ export function KeyboardPanel({ selected, onSelect, editMode }: Props) {
     onDoubleClick: () => { if (!editMode) trigger(bank.id, code); },
     onDropKey: (from: string) => swapPads(bank.id, from, code),
     onDropFile: (fileId: string) => { const l = lib.get(fileId); updatePad(bank.id, code, { fileId, name: bank.pads[code]?.name || l?.name || "" }); onSelect(code); },
+    onSelect,
   });
 
   const renderRows = (rows: Row[]) =>
@@ -100,9 +101,10 @@ export function KeyboardPanel({ selected, onSelect, editMode }: Props) {
 interface KeyProps {
   code: string; w: number; pad?: Pad; lib: Map<string, LibItem>; selected: boolean; reserved: boolean; playing: boolean; label: string;
   barRef: (el: HTMLDivElement | null) => void; onClick: () => void; onDoubleClick: () => void; onDropKey: (from: string) => void; onDropFile: (id: string) => void;
+  onSelect: (code: string) => void;
 }
 
-function PadKey({ code, w, pad, lib, selected, reserved, playing, label, barRef, onClick, onDoubleClick, onDropKey, onDropFile }: KeyProps) {
+function PadKey({ code, w, pad, lib, selected, reserved, playing, label, barRef, onClick, onDoubleClick, onDropKey, onDropFile, onSelect }: KeyProps) {
   const p = pad ?? defaultPad();
   const item = pad?.fileId ? lib.get(pad.fileId) : undefined;
   const assigned = !!pad?.fileId;
