@@ -80,7 +80,14 @@ export function ActivationGate({ children }: { children: ReactNode }) {
     return () => { cancelled = true; };
   }, []);
 
-  function onStartTrial() {\n    const startedAt = startTrial();\n    setTrialAvailable(false);\n    setTrialEndsAt(startedAt + TRIAL_DURATION_MS);\n    setRemainingMs(Math.max(0, startedAt + TRIAL_DURATION_MS - Date.now()));\n  }\n\n  async function onSubmit(event: FormEvent<HTMLFormElement>) {
+  function onStartTrial() {
+    const startedAt = startTrial();
+    setTrialAvailable(false);
+    setTrialEndsAt(startedAt + TRIAL_DURATION_MS);
+    setRemainingMs(Math.max(0, startedAt + TRIAL_DURATION_MS - Date.now()));
+  }
+
+  async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setBusy(true);
     setError("");
@@ -102,7 +109,15 @@ export function ActivationGate({ children }: { children: ReactNode }) {
   }
 
   if (!ready) return <div className="grid min-h-screen place-items-center bg-[#05070c] text-cyan-300">Carregando VEXORA SAMPLER…</div>;
-  if (activation) return <>{children}</>;\n  if (trialEndsAt !== null && remainingMs > 0) return <><div className="fixed right-3 top-3 z-[100] rounded-lg border border-cyan-400/50 bg-slate-950/95 px-3 py-2 text-sm font-bold text-cyan-200 shadow-lg">Teste grátis: {Math.floor(remainingMs / 60000)}:{String(Math.floor((remainingMs % 60000) / 1000)).padStart(2, "0")} restantes</div>{children}</>;
+  if (activation) return <>{children}</>;
+  if (trialEndsAt !== null && remainingMs > 0) return (
+    <>
+      <div className="fixed right-3 top-3 z-[100] rounded-lg border border-cyan-400/50 bg-slate-950/95 px-3 py-2 text-sm font-bold text-cyan-200 shadow-lg">
+        Teste grátis: {Math.floor(remainingMs / 60000)}:{String(Math.floor((remainingMs % 60000) / 1000)).padStart(2, "0")} restantes
+      </div>
+      {children}
+    </>
+  );
 
   return (
     <main className="grid min-h-screen place-items-center bg-[#05070c] p-4 text-white">
@@ -112,7 +127,8 @@ export function ActivationGate({ children }: { children: ReactNode }) {
           <div><p className="text-xs font-bold tracking-[.25em] text-cyan-300">VEXORA SAMPLER</p><h1 className="text-xl font-bold">Ativação da licença</h1></div>
         </div>
         <p className="mb-5 text-sm text-slate-300">Informe o e-mail e a chave de licença para ativar o VEXORA SAMPLER.</p>
-        {trialAvailable && <div className="mb-4 rounded-xl border border-emerald-400/30 bg-emerald-400/5 p-3"><p className="mb-2 text-sm text-slate-300">Experimente o VEXORA por 5 minutos antes de ativar sua licença.</p><button type="button" onClick={onStartTrial} className="flex w-full items-center justify-center gap-2 rounded-lg border border-emerald-400/60 bg-emerald-400/10 px-4 py-3 font-bold text-emerald-200 transition hover:bg-emerald-400/20"><Clock3 className="size-4" /> Iniciar teste grátis (5 minutos)</button></div>}\n        <form onSubmit={onSubmit} className="space-y-3">
+        {trialAvailable && <div className="mb-4 rounded-xl border border-emerald-400/30 bg-emerald-400/5 p-3"><p className="mb-2 text-sm text-slate-300">Experimente o VEXORA por 5 minutos antes de ativar sua licença.</p><button type="button" onClick={onStartTrial} className="flex w-full items-center justify-center gap-2 rounded-lg border border-emerald-400/60 bg-emerald-400/10 px-4 py-3 font-bold text-emerald-200 transition hover:bg-emerald-400/20"><Clock3 className="size-4" /> Iniciar teste grátis (5 minutos)</button></div>}
+        <form onSubmit={onSubmit} className="space-y-3">
           <label className="block text-sm">E-mail da licença<input type="email" autoComplete="email" required value={email} onChange={e => setEmail(e.target.value)} className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2.5 outline-none focus:border-cyan-400" /></label>
           <label className="block text-sm">Chave de licença<input type="password" autoComplete="off" minLength={12} required value={licenseKey} onChange={e => setLicenseKey(e.target.value)} className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2.5 font-mono outline-none focus:border-cyan-400" /></label>
           {error && <p role="alert" className="rounded-lg border border-red-500/30 bg-red-950/30 p-3 text-sm text-red-200">{error}</p>}
