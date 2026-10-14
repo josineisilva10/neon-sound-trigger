@@ -62,77 +62,44 @@ function AudioInfoPanel({ code, ledActive, onToggleLed }: { code: string | null;
   ];
 
   return (
-    <div className="panel min-w-0 space-y-0.5 p-0.5">
-      <div className="flex items-center justify-between gap-1">
-        <h2 className="font-display text-[10px] font-bold tracking-wide text-neon-cyan">INFORMAÇÕES DO ÁUDIO</h2>
-        <span className="text-[8px] text-muted-foreground">{item ? "SELECIONADO" : "SEM ÁUDIO"}</span>
-      </div>
-      {!item ? (
-        <div className="flex min-h-16 items-center gap-2 rounded-md border border-border bg-background/40 p-2">
-          <Music2 className="size-5 text-neon-cyan" />
-          <p className="text-[10px] text-muted-foreground">{code ? "Esta tecla ainda não tem áudio." : "Selecione uma tecla com áudio para ver os detalhes."}</p>
+    <div className="panel min-w-0 space-y-1 overflow-y-auto p-1">
+      {item && (
+        <div className="flex min-w-0 items-center gap-1 rounded border border-border bg-background/40 px-1 py-0.5">
+          <Music2 className="size-3 shrink-0 text-neon-cyan" />
+          <span className="min-w-0 flex-1 truncate text-[9px]">{pad?.name || item.name}</span>
+          <button className="btn !p-1" title="Tocar áudio" onClick={() => code && trigger(bank.id, code)}><Play className="size-3" /></button>
+          <button className="btn !p-1" title="Parar áudio" onClick={() => code && stopPad(bank.id, code)}><Square className="size-3" /></button>
         </div>
-      ) : (
-        <>
-          <div className="flex min-w-0 items-center gap-1 rounded-md border border-border bg-background/40 p-0.5">
-            <Music2 className="size-4 shrink-0 text-neon-cyan" />
-            <div className="min-w-0 flex-1">
-              <div className="truncate text-[10px] font-semibold">{pad?.name || item.name}</div>
-              <div className="text-[8px] text-muted-foreground">{fmtTime(item.duration)} · {item.format} · {(item.size / (1024 * 1024)).toFixed(1)} MB</div>
-            </div>
-            <button className="btn !p-1" title="Tocar áudio" onClick={() => code && trigger(bank.id, code)}><Play className="size-3" /></button>
-            <button className="btn !p-1" title="Parar áudio" onClick={() => code && stopPad(bank.id, code)}><Square className="size-3" /></button>
+      )}
+      <div className="grid grid-cols-3 gap-0.5">
+        {actions.map(({ label, icon: Icon, color, border, onClick, title }) => (
+          <button key={label} className={`flex min-h-8 flex-col items-center justify-center gap-0 rounded-md border bg-background/50 px-0.5 py-0.5 transition-colors hover:bg-muted/70 ${border} ${color}`} onClick={onClick} title={title} disabled={!code || !item}>
+            <Icon className="size-3" />
+            <span className="text-center text-[7px] font-bold leading-tight">{label}</span>
+          </button>
+        ))}
+      </div>
+      {showTrim && item && (
+        <div className="space-y-1 rounded-md border border-neon-cyan/50 bg-background/90 p-1">
+          <div className="flex items-center justify-between gap-1">
+            <strong className="text-[9px] text-neon-cyan">CORTAR ÁUDIO</strong>
+            <button className="btn !px-1.5 !py-0.5 text-[8px]" onClick={() => setShowTrim(false)}>Fechar</button>
           </div>
-          <div className="rounded-md border border-neon-cyan/30 bg-background/60 px-1 py-0.5">
-            <Waveform peaks={item.peaks} color={pad?.color || "#22d3ee"} height={20} />
+          <div className="truncate text-[8px] text-muted-foreground">{pad?.name || item.name} · {fmtTime(item.duration)}</div>
+          <div className="rounded border border-neon-cyan/30 bg-background/60 p-1">
+            <Waveform peaks={item.peaks} color={pad?.color || "#22d3ee"} height={18} />
           </div>
-          <div className="grid grid-cols-3 gap-1 text-[7px]">
-            <div className="rounded border border-border bg-background/40 p-1"><span className="block text-muted-foreground">FORMATO</span><strong>{item.format}</strong></div>
-            <div className="rounded border border-border bg-background/40 p-1"><span className="block text-muted-foreground">DURAÇÃO</span><strong>{fmtTime(item.duration)}</strong></div>
-            <div className="rounded border border-border bg-background/40 p-1"><span className="block text-muted-foreground">TAMANHO</span><strong>{(item.size / (1024 * 1024)).toFixed(1)} MB</strong></div>
+          <label className="block text-[8px]">Ponto inicial: {trimStart.toFixed(2)} s
+            <input aria-label="Ponto inicial do corte" className="w-full accent-cyan-400" type="range" min={0} max={Math.max(0, item.duration - 0.05)} step={0.01} value={Math.min(trimStart, Math.max(0, item.duration - 0.05))} onChange={(e) => setTrimStart(Math.min(+e.target.value, trimEnd - 0.05))} />
+          </label>
+          <label className="block text-[8px]">Ponto final: {trimEnd.toFixed(2)} s
+            <input aria-label="Ponto final do corte" className="w-full accent-cyan-400" type="range" min={Math.min(item.duration, trimStart + 0.05)} max={item.duration} step={0.01} value={Math.max(trimEnd, trimStart + 0.05)} onChange={(e) => setTrimEnd(+e.target.value)} />
+          </label>
+          <div className="grid grid-cols-2 gap-1">
+            <button className="btn !py-1 text-[8px]" onClick={() => { if (code && trimEnd > trimStart) { void trimPadAudio(bank.id, code, trimStart, trimEnd); setShowTrim(false); } }}>✓ MANTER</button>
+            <button className="btn !py-1 text-[8px]" onClick={() => { setTrimStart(0); setTrimEnd(item.duration); }}>↺ REINICIAR</button>
           </div>
-          {showTrim && (
-            <div className="space-y-2 rounded-md border border-neon-cyan/50 bg-background/80 p-2">
-              <div className="flex items-center justify-between gap-2">
-                <strong className="text-[10px] text-neon-cyan">CORTAR ÁUDIO</strong>
-                <button className="btn !px-2 !py-1 text-[9px]" onClick={() => setShowTrim(false)}>Fechar</button>
-              </div>
-              <div className="flex items-center justify-between gap-2 text-[8px] text-muted-foreground">
-                <span>{pad?.name || item.name}</span><span>{fmtTime(item.duration)} · {item.format}</span>
-              </div>
-              <div className="relative overflow-hidden rounded-md border border-border bg-[#080d1b] p-2">
-                <div className="mb-1 flex justify-between font-mono text-[8px] text-slate-400"><span>00:00</span><span>{fmtTime(item.duration / 2)}</span><span>{fmtTime(item.duration)}</span></div>
-                <div className="relative flex h-20 items-center gap-[1px] overflow-hidden rounded border border-slate-700/70">
-                  {item.peaks.map((peak, i) => {
-                    const t = (i / Math.max(1, item.peaks.length - 1)) * item.duration;
-                    const selectedPeak = t >= trimStart && t <= trimEnd;
-                    return <div key={i} className="flex-1 rounded-sm" style={{height: `${Math.max(4, peak * 90)}%`,background: selectedPeak ? "#22d3ee" : "#64748b",opacity:selectedPeak ? 0.95 : 0.4}} />;
-                  })}
-                  <div className="pointer-events-none absolute inset-y-0 border-x-2 border-cyan-300 bg-cyan-400/15" style={{left:`${(trimStart / Math.max(item.duration,0.01))*100}%`,width:`${Math.max(0,(trimEnd-trimStart)/Math.max(item.duration,0.01)*100)}%`}} />
-                </div>
-                <div className="mt-1 flex justify-between text-[8px] text-cyan-300"><span>Início: {trimStart.toFixed(2)} s</span><span>Fim: {trimEnd.toFixed(2)} s</span></div>
-              </div>
-              <label className="block text-[9px]">Ponto inicial
-                <input aria-label="Ponto inicial do corte" className="w-full accent-cyan-400" type="range" min={0} max={Math.max(0, item.duration - 0.05)} step={0.01} value={Math.min(trimStart, Math.max(0, item.duration - 0.05))} onChange={(e) => setTrimStart(Math.min(+e.target.value, trimEnd - 0.05))} />
-              </label>
-              <label className="block text-[9px]">Ponto final
-                <input aria-label="Ponto final do corte" className="w-full accent-cyan-400" type="range" min={Math.min(item.duration, trimStart + 0.05)} max={item.duration} step={0.01} value={Math.max(trimEnd, trimStart + 0.05)} onChange={(e) => setTrimEnd(+e.target.value)} />
-              </label>
-              <div className="grid grid-cols-2 gap-1">
-                <button className="btn !py-1.5 text-[9px]" onClick={() => { if (code && trimEnd > trimStart) { void trimPadAudio(bank.id, code, trimStart, trimEnd); setShowTrim(false); } }}>✓ MANTER SELEÇÃO</button>
-                <button className="btn !py-1.5 text-[9px]" onClick={() => { setTrimStart(0); setTrimEnd(item.duration); }}>↺ REINICIAR SELEÇÃO</button>
-              </div>
-            </div>
-          )}
-          <div className="grid grid-cols-3 gap-0.5">
-            {actions.map(({ label, icon: Icon, color, border, onClick, title }) => (
-              <button key={label} className={`flex min-h-8 flex-col items-center justify-center gap-0 rounded-md border bg-background/50 px-0.5 py-0.5 transition-colors hover:bg-muted/70 ${border} ${color}`} onClick={onClick} title={title} disabled={!onClick}>
-                <Icon className="size-3" />
-                <span className="text-center text-[7px] font-bold leading-tight">{label}</span>
-              </button>
-            ))}
-          </div>
-        </>
+        </div>
       )}
     </div>
   );
@@ -269,7 +236,7 @@ function App() {
       <Toaster theme="dark" position="bottom-right" richColors />
 
       <main className="grid h-full min-h-0 min-w-0 grid-cols-[190px_minmax(0,1fr)] items-stretch gap-1.5 overflow-hidden p-1.5">
-        <aside className="flex h-full min-h-0 min-w-0 flex-col gap-1.5 overflow-hidden">
+        <aside className="flex h-full min-h-0 min-w-0 flex-col gap-1.5 overflow-y-auto">
           <div className="panel flex min-h-[48px] items-center justify-center gap-1.5 overflow-hidden px-1 py-1">
             <img src="/vexora-logo.svg" alt="Símbolo VEXORA" className="size-9 shrink-0 drop-shadow-[0_0_7px_#00d9ff]" />
             <h1 className="text-center font-display text-sm font-extrabold leading-none tracking-[0.12em] text-neon-green neon-text">VEXORA<br /><span className="text-neon-cyan">SAMPLER</span></h1>
