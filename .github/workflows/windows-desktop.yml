@@ -1,9 +1,6 @@
 name: Windows Desktop Installer
 
 on:
-  push:
-    branches:
-      - windows-desktop-setup
   workflow_dispatch:
 
 permissions:
