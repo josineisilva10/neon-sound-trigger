@@ -63,14 +63,6 @@ function AudioInfoPanel({ code, ledActive, onToggleLed }: { code: string | null;
 
   return (
     <div className="panel min-w-0 space-y-1 overflow-y-auto p-1">
-      {item && (
-        <div className="flex min-w-0 items-center gap-1 rounded border border-border bg-background/40 px-1 py-0.5">
-          <Music2 className="size-3 shrink-0 text-neon-cyan" />
-          <span className="min-w-0 flex-1 truncate text-[9px]">{pad?.name || item.name}</span>
-          <button className="btn !p-1" title="Tocar áudio" onClick={() => code && trigger(bank.id, code)}><Play className="size-3" /></button>
-          <button className="btn !p-1" title="Parar áudio" onClick={() => code && stopPad(bank.id, code)}><Square className="size-3" /></button>
-        </div>
-      )}
       <div className="grid grid-cols-3 gap-0.5">
         {actions.map(({ label, icon: Icon, color, border, onClick, title }) => (
           <button key={label} className={`flex min-h-8 flex-col items-center justify-center gap-0 rounded-md border bg-background/50 px-0.5 py-0.5 transition-colors hover:bg-muted/70 ${border} ${color}`} onClick={onClick} title={title} disabled={!code || !item}>
@@ -86,8 +78,15 @@ function AudioInfoPanel({ code, ledActive, onToggleLed }: { code: string | null;
             <button className="btn !px-1.5 !py-0.5 text-[8px]" onClick={() => setShowTrim(false)}>Fechar</button>
           </div>
           <div className="truncate text-[8px] text-muted-foreground">{pad?.name || item.name} · {fmtTime(item.duration)}</div>
-          <div className="rounded border border-neon-cyan/30 bg-background/60 p-1">
-            <Waveform peaks={item.peaks} color={pad?.color || "#22d3ee"} height={18} />
+          <div className="relative flex h-[58px] items-center gap-[1px] overflow-hidden rounded border border-neon-cyan/40 bg-[#06101d] px-1">
+            <div className="pointer-events-none absolute inset-y-0 left-0 z-10 border-l-2 border-amber-300" style={{ left: `${(trimStart / Math.max(item.duration, 0.01)) * 100}%` }} />
+            {item.peaks.map((peak, i) => {
+              const t = (i / Math.max(1, item.peaks.length - 1)) * item.duration;
+              const selected = t >= trimStart && t <= trimEnd;
+              return <div key={i} className="relative z-[1] flex-1 rounded-[1px] transition-colors" style={{ height: `${Math.max(5, peak * 88)}%`, background: selected ? (pad?.color || "#22d3ee") : "#526579", opacity: selected ? 0.95 : 0.32 }} />;
+            })}
+            <div className="pointer-events-none absolute inset-y-0 z-10 border-r-2 border-amber-300" style={{ left: `${(trimEnd / Math.max(item.duration, 0.01)) * 100}%` }} />
+            <div className="pointer-events-none absolute inset-y-0 z-[2] bg-cyan-300/10" style={{ left: `${(trimStart / Math.max(item.duration, 0.01)) * 100}%`, width: `${Math.max(0, ((trimEnd - trimStart) / Math.max(item.duration, 0.01)) * 100)}%` }} />
           </div>
           <label className="block text-[8px]">Ponto inicial: {trimStart.toFixed(2)} s
             <input aria-label="Ponto inicial do corte" className="w-full accent-cyan-400" type="range" min={0} max={Math.max(0, item.duration - 0.05)} step={0.01} value={Math.min(trimStart, Math.max(0, item.duration - 0.05))} onChange={(e) => setTrimStart(Math.min(+e.target.value, trimEnd - 0.05))} />
