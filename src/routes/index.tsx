@@ -268,8 +268,8 @@ function App() {
       {wallStyle && w.target === "full" && <div className="fixed inset-0 -z-10" style={wallStyle}><div className="absolute inset-0 bg-background" style={{ opacity: w.dim }} /></div>}
       <Toaster theme="dark" position="bottom-right" richColors />
 
-      <main className="grid h-full min-h-0 min-w-0 grid-cols-1 items-start gap-1.5 overflow-hidden p-1.5 lg:grid-cols-[190px_minmax(0,1fr)]">
-        <aside className="flex min-w-0 flex-col gap-1.5">
+      <main className="grid h-full min-h-0 min-w-0 grid-cols-[190px_minmax(0,1fr)] items-stretch gap-1.5 overflow-hidden p-1.5">
+        <aside className="flex h-full min-h-0 min-w-0 flex-col gap-1.5 overflow-hidden">
           <div className="panel flex min-h-[48px] items-center justify-center gap-1.5 overflow-hidden px-1 py-1">
             <img src="/vexora-logo.svg" alt="Símbolo VEXORA" className="size-9 shrink-0 drop-shadow-[0_0_7px_#00d9ff]" />
             <h1 className="text-center font-display text-sm font-extrabold leading-none tracking-[0.12em] text-neon-green neon-text">VEXORA<br /><span className="text-neon-cyan">SAMPLER</span></h1>
@@ -277,8 +277,8 @@ function App() {
           <SidePanel selected={selected} />
           {st.show.editor && <AudioInfoPanel code={selected} ledActive={ledActive} onToggleLed={() => setLedActive((v) => !v)} />}
         </aside>
-        <section className="flex min-h-0 min-w-0 flex-col gap-1.5 overflow-hidden">
-          <div className="relative aspect-[3/1] min-h-0 w-full overflow-hidden rounded-md border border-border" style={bannerWallStyle}>
+        <section className="flex h-full min-h-0 min-w-0 flex-col gap-1.5 overflow-hidden">
+          <div className="relative aspect-[3/1] min-h-[220px] w-full shrink-0 overflow-hidden rounded-md border border-border bg-[#06152d]" style={bannerWallStyle}>
             {wall && w.enabled && <div className="absolute inset-0 bg-background" style={{ opacity: w.dim }} />}
             <div className="absolute right-1 top-1 z-20 flex gap-1">
               <button className="btn !p-1.5" onClick={() => setShowSettings(true)} aria-label="Configurações" title="Configurações"><Cog className="size-4" /></button>
@@ -289,7 +289,7 @@ function App() {
           </div>
           {ledActive && audioPlaying ? <LedVisualizer onBack={() => setLedActive(false)} /> : <KeyboardPanel selected={selected} onSelect={setSelected} editMode={editMode} />}
 {/* Painel de edição ocultado temporariamente para testar o espaço disponível. */}
-          <div className="panel relative h-6 overflow-hidden border-cyan-400/60 bg-[#020713] px-0 py-0 shadow-[0_0_10px_rgba(0,217,255,0.15)]" aria-label="Créditos do VEXORA SAMPLER">
+          <div className="panel relative h-6 min-h-6 shrink-0 overflow-hidden border-cyan-400/60 bg-[#020713] px-0 py-0 shadow-[0_0_10px_rgba(0,217,255,0.15)]" aria-label="Créditos do VEXORA SAMPLER">
             <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-8 bg-gradient-to-r from-[#020713] to-transparent" />
             <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-8 bg-gradient-to-l from-[#020713] to-transparent" />
             <div className="vexora-led-track h-full items-center">
