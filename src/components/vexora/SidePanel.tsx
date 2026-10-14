@@ -27,24 +27,24 @@ export function SidePanel({ selected }: { selected: string | null }) {
 
   return (
     <aside className="flex min-w-0 flex-col gap-1.5">
-      <div className="panel p-2">
-        <div className="mb-1 flex items-center justify-between">
+      <div className="panel p-1.5">
+        <div className="mb-0.5 flex items-center justify-between">
           <span className="font-display text-xs tracking-widest text-neon-cyan">MASTER</span>
           <span className={`font-mono text-[10px] ${voices.length ? "text-neon-green neon-text" : "text-muted-foreground"}`}>{engine.paused ? "PAUSADO" : voices.length ? `● ${voices.length} ATIVO(S)` : "○ PARADO"}</span>
         </div>
-        <div className="flex items-stretch gap-2">
+        <div className="flex items-stretch gap-1.5">
           <StereoMeter />
-          <div className="flex flex-1 flex-col justify-between gap-1">
-            <label className="text-xs text-muted-foreground">Volume {Math.round(st.master * 100)}%
+          <div className="flex flex-1 flex-col justify-between gap-0.5">
+            <label className="text-[10px] text-muted-foreground">Volume {Math.round(st.master * 100)}%
               <input className="w-full" type="range" min={0} max={1} step={0.01} value={st.master} onChange={(e) => setSettings({ master: +e.target.value })} />
             </label>
-            <div className="grid grid-cols-4 gap-1">
+            <div className="grid grid-cols-4 gap-0.5">
               <button className="btn" title="Tocar pad selecionado / retomar" onClick={() => (engine.paused ? engine.resume() : selected && trigger(s.activeBank, selected))}><Play className="size-4" /></button>
               <button className="btn" title="Pausar" onClick={() => engine.pause()}><Pause className="size-4" /></button>
               <button className="btn" title="Parar com fade" onClick={() => engine.stopAll(0.5)}><Square className="size-4" /></button>
               <button className={`btn ${st.muted ? "text-neon-red" : ""}`} title="Mudo" onClick={() => setSettings({ muted: !st.muted })}>{st.muted ? <VolumeX className="size-4" /> : <Volume2 className="size-4" />}</button>
             </div>
-            <button className="btn-danger !px-2 !py-1 text-xs" onClick={() => engine.stopAll()}><OctagonX className="size-4" /> STOP</button>
+            <button className="btn-danger !px-1.5 !py-0.5 text-[10px]" onClick={() => engine.stopAll()}><OctagonX className="size-4" /> STOP</button>
           </div>
         </div>
       </div>
