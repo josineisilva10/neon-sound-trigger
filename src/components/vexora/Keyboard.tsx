@@ -110,24 +110,40 @@ function PadKey({ code, w, pad, lib, selected, reserved, playing, label, barRef,
     <button
       type="button"
       draggable={!!pad}
-      onDragStart={(e) => e.dataTransfer.setData("vexora/key", code)}
-      onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); e.dataTransfer.dropEffect = e.dataTransfer.types.includes("Files") ? "copy" : "move"; }} onDragEnter={(e) => { e.preventDefault(); e.stopPropagation(); }}
+      onDragStart={(e) => {
+        e.dataTransfer.effectAllowed = "move";
+        e.dataTransfer.setData("vexora/key", code);
+      }}
+      onDragOver={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const hasFiles = Array.from(e.dataTransfer.types ?? []).includes("Files");
+        e.dataTransfer.dropEffect = hasFiles ? "copy" : "move";
+      }}
+      onDragEnter={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      }}
       onDrop={(e) => {
         e.preventDefault();
         e.stopPropagation();
         const k = e.dataTransfer.getData("vexora/key");
         const fileId = e.dataTransfer.getData("vexora/file");
+        // Capture the FileList while the drop event is active.
         const droppedFiles = Array.from(e.dataTransfer.files ?? []);
         if (k && k !== code) {
           onDropKey(k);
-        } else if (fileId) {
+          return;
+        }
+        if (fileId) {
           onDropFile(fileId);
-        } else if (droppedFiles.length) {
-          // Import audio files dragged directly from the computer onto a key.
+          return;
+        }
+        if (droppedFiles.length) {
           void importAudioFiles(droppedFiles).then((ids) => {
             const id = ids[0];
             if (!id) return;
-            const name = droppedFiles[0].name.replace(/\.[^.]+$/, "");
+            const name = droppedFiles[0].name.replace(/\\.[^.]+$/, "");
             const currentState = store.get();
             const currentBank = currentState.banks.find((b) => b.id === currentState.activeBank);
             if (!currentBank) return;
@@ -136,7 +152,10 @@ function PadKey({ code, w, pad, lib, selected, reserved, playing, label, barRef,
           });
         }
       }}
-      onMouseDown={(e) => e.preventDefault()}
+      onMouseDown={(e) => {
+        // Keep the key focused without interfering with file dragging.
+        if (e.button !== 0) e.preventDefault();
+      }}
       onClick={onClick}
       onDoubleClick={onDoubleClick}
       className="padkey px-1.5 py-1.5"
